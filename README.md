@@ -6,6 +6,8 @@ please make sure to feel free to switch lab spaces during the later half of the 
 go at testing your systems on the track. Below are the design requirements and design constraints
 that needs to met by the Smart self-parking vehicle (SSV) you design, while meeting the event
 regulations.
+![image](https://github.com/user-attachments/assets/6ffbbc22-04f8-4503-a458-eaa74040a1e2)
+![image](https://github.com/user-attachments/assets/d0f04720-31eb-4e0c-be86-d61f122de84a)
 Fig. 1(top). Arena for the SSV showing the starting point and the parking bays and (bottom)
 Colored tiles placed at the parking bay’s rear wall and parking sensors to check successful vehicle
 parking.
@@ -55,47 +57,49 @@ to pivot with a sharper turning radius
 (see Fig 2 for an example of differential
 drive robot) Fig.2. Example of a differential drive
 robot (which is not allowed)
+![image](https://github.com/user-attachments/assets/90b92ffa-2223-4501-9b79-77710490091c)
 ENGMT280/ENGEE281 – 25B
 g. If the use of some standard parts causes the width of the SSV to be slightly higher than
 the allowed SSV width, the teaching team may allow it.
-13. All the colored tiles and the reference tile will only be placed after the SSV starts moving.
-14. The order of colours tiles placed in the slots will be at random, and their orders will be
+14. All the colored tiles and the reference tile will only be placed after the SSV starts moving.
+15. The order of colours tiles placed in the slots will be at random, and their orders will be
 changed between each team’s runs.
-15. The reference-colored tile will be placed before the SSV reaches the location.
-16. The SSVs needs to stop within the correctly identiϐied parking bay’s engraved area and should
+16. The reference-colored tile will be placed before the SSV reaches the location.
+![image](https://github.com/user-attachments/assets/fe21464f-3bfd-4ec4-9a5e-50219ba17787)
+17. The SSVs needs to stop within the correctly identiϐied parking bay’s engraved area and should
 not bump the rear walls/colored tiles.
 Fig. 2. Rendering showing what the dummy car placements will be like
-17. Dummy model cars will also be placed at random creating randomized open parking bays in
+18. Dummy model cars will also be placed at random creating randomized open parking bays in
 the arena.
-18. The dummy model cars will not have the same color as the colored tiles that would be
+19. The dummy model cars will not have the same color as the colored tiles that would be
 randomly placed to avoid ambiguity.
-19. If the randomly chosen reference-color tile has a color that already has the dummy model
+20. If the randomly chosen reference-color tile has a color that already has the dummy model
 cars creating a situation where no valid parking bays are present, the SSV should continue
 forward and come to a safe stop within the engraved area opposite to the starting spot.
-20. Apart from the batteries provided, no other energy sources can be added to the SSV.
+21. Apart from the batteries provided, no other energy sources can be added to the SSV.
 Components like elastic bands and light springs will be considered on a case-by-case basis.
 (Make sure to consult before design decisions are made if using such energy storage devices).
-21. All SSVs will be inspected to ensure unauthorized items are not present on the system and
+22. All SSVs will be inspected to ensure unauthorized items are not present on the system and
 they completely comply with all the dimensional and dynamic constraints.
-22. SAVs considered unsafe to the users/ spectators/university buildings etc., will be disqualiϐied
+23. SAVs considered unsafe to the users/ spectators/university buildings etc., will be disqualiϐied
 at the discretion of the teaching team. Take care to consider H&S risk elements such as sharp
 edges, ϐinger traps, electrical shorts, etc., and address them appropriately.
-23. A list of available materials will be made available on Moodle under ‘design project resources’
+24. A list of available materials will be made available on Moodle under ‘design project resources’
 section. Any speciϐic equipment if needed, needs to have prior permission obtained.
-24. Under the discretion of the teaching team, 3D printing of parts may be allowed if its within a
+25. Under the discretion of the teaching team, 3D printing of parts may be allowed if its within a
 volume of 3000 mm3 and merits the shape complexity that cannot be otherwise
 manufactured using conventional fabrication approach.
 ENGMT280/ENGEE281 – 25B
-25. As an optional part, the teams can obtain a vacuformed body shell similar to that of the
+26. As an optional part, the teams can obtain a vacuformed body shell similar to that of the
 dummy model car to put over your design. As such, the teams design should ensure all
 electronics are within this envelope. Cut outs can be made on the vacuformed body shell to
 allow for uninterrupted operation of any sensors.
-26. YOUR SSV SHOULD BE CAPABLE OF ADAPTING TO THE CHANGING LIGHTING CONDITIONS
+27. YOUR SSV SHOULD BE CAPABLE OF ADAPTING TO THE CHANGING LIGHTING CONDITIONS
 THROUGHOUT THE DAY ACROSS THE TRIMESTER. Any complaints that the lighting is too
 harsh or varying will not be tolerated.
-27. You will be given 3 tries to ϐinish your run and the best time of the three runs will be taken
+28. You will be given 3 tries to ϐinish your run and the best time of the three runs will be taken
 for ϐinal grading.
-28. If you have any queries on a speciϐic rule, please reach out for clariϐication. Do not assume
+29. If you have any queries on a speciϐic rule, please reach out for clariϐication. Do not assume
 your own interpretation of a rule to be correct and have that as the deciding factor for any
 design decisions made if there is any ambiguity in a rule.
 Rule updates since ϐirst upload
