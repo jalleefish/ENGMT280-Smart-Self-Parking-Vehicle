@@ -6,6 +6,7 @@ please make sure to feel free to switch lab spaces during the later half of the 
 go at testing your systems on the track. Below are the design requirements and design constraints
 that needs to met by the Smart self-parking vehicle (SSV) you design, while meeting the event
 regulations.
+
 ![image](https://github.com/user-attachments/assets/6ffbbc22-04f8-4503-a458-eaa74040a1e2)
 ![image](https://github.com/user-attachments/assets/d0f04720-31eb-4e0c-be86-d61f122de84a)
 
@@ -58,6 +59,7 @@ to pivot with a sharper turning radius
 (see Fig 2 for an example of differential
 drive robot) Fig.2. Example of a differential drive
 robot (which is not allowed)
+
 ![image](https://github.com/user-attachments/assets/90b92ffa-2223-4501-9b79-77710490091c)
 
 ENGMT280/ENGEE281 – 25B
@@ -67,6 +69,7 @@ the allowed SSV width, the teaching team may allow it.
 15. The order of colours tiles placed in the slots will be at random, and their orders will be
 changed between each team’s runs.
 16. The reference-colored tile will be placed before the SSV reaches the location.
+
 ![image](https://github.com/user-attachments/assets/fe21464f-3bfd-4ec4-9a5e-50219ba17787)
 
 17. The SSVs needs to stop within the correctly identiϐied parking bay’s engraved area and should
