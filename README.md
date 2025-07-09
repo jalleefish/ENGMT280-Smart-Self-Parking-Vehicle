@@ -8,6 +8,7 @@ that needs to met by the Smart self-parking vehicle (SSV) you design, while meet
 regulations.
 ![image](https://github.com/user-attachments/assets/6ffbbc22-04f8-4503-a458-eaa74040a1e2)
 ![image](https://github.com/user-attachments/assets/d0f04720-31eb-4e0c-be86-d61f122de84a)
+
 Fig. 1(top). Arena for the SSV showing the starting point and the parking bays and (bottom)
 Colored tiles placed at the parking bay’s rear wall and parking sensors to check successful vehicle
 parking.
@@ -58,6 +59,7 @@ to pivot with a sharper turning radius
 drive robot) Fig.2. Example of a differential drive
 robot (which is not allowed)
 ![image](https://github.com/user-attachments/assets/90b92ffa-2223-4501-9b79-77710490091c)
+
 ENGMT280/ENGEE281 – 25B
 g. If the use of some standard parts causes the width of the SSV to be slightly higher than
 the allowed SSV width, the teaching team may allow it.
@@ -66,6 +68,7 @@ the allowed SSV width, the teaching team may allow it.
 changed between each team’s runs.
 16. The reference-colored tile will be placed before the SSV reaches the location.
 ![image](https://github.com/user-attachments/assets/fe21464f-3bfd-4ec4-9a5e-50219ba17787)
+
 17. The SSVs needs to stop within the correctly identiϐied parking bay’s engraved area and should
 not bump the rear walls/colored tiles.
 Fig. 2. Rendering showing what the dummy car placements will be like
