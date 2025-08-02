@@ -1,15 +1,7 @@
 {
 	"folders": [
 		{
-			"path": ".."
-		},
-		{
-			"name": "Self Parking Car",
-			"path": "../../../../../../Documents/PlatformIO/Projects/Self Parking Car"
-		},
-		{
-			"name": "Self Parking Car",
-			"path": "Self Parking Car"
+			"path": "."
 		}
 	],
 	"settings": {}
