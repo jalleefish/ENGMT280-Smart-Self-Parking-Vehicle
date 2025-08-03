@@ -1,0 +1,88 @@
+(footprint "18650 Battery Holder"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "Batt Holder"
+		(at 0 -5.08 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "7b9ac566-a1c3-4c3b-b57f-a1cec45fb8c2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "18650"
+		(at 0 -2.54 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "a438445c-e754-4a0e-8e79-ef047f608252")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "94bae90b-f625-40e1-9d93-f0bafea843a0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "c5c4aadc-2d4a-4326-8dca-7a4928823dd4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_text user "LG MH1 18650"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "f81c08e6-6f49-4a33-8356-da417257ab41")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -2.54 2.54)
+		(size 1.4 1.4)
+		(drill 1.02)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(clearance 0)
+		(uuid "d7412351-7885-46a3-b96e-9d528836127e")
+	)
+	(pad "2" thru_hole circle
+		(at 0 2.54)
+		(size 1.4 1.4)
+		(drill 1.02)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(clearance 0)
+		(uuid "e84dcc1b-7a3a-4e31-b31a-0c5fce08ca15")
+	)
+	(embedded_fonts no)
+)

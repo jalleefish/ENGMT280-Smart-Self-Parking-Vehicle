@@ -1,0 +1,97 @@
+(footprint "S-G90 Servo"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "Servo Mount"
+		(at 0 -2.54 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "65a3c125-7bf0-4f5c-8278-8892a370ef9d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "S- G90"
+		(at 0 -1.04 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "65c64ec3-cfd8-4503-b83d-4bbb788cc953")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6d21e493-f8fd-45ce-9153-762d74123238")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ea4e02c9-e090-4d71-9354-018b9c35d0ab")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_text user "4.8V-6V"
+		(at 0 0.46 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "3c48a9ca-fccc-4dda-88db-a0bd179710a1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -2.54 2.54)
+		(size 1.4 1.4)
+		(drill 1.02)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(clearance 0)
+		(uuid "5dd35a3f-b686-4398-9280-562b41b5f173")
+	)
+	(pad "2" thru_hole circle
+		(at 0 2.54)
+		(size 1.4 1.4)
+		(drill 1.02)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(clearance 0)
+		(uuid "9866b55e-7cdf-41ee-955a-15b2ee1032d3")
+	)
+	(pad "3" thru_hole circle
+		(at 2.54 2.54)
+		(size 1.4 1.4)
+		(drill 1.02)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(clearance 0)
+		(uuid "f9d12eb8-2137-4a4d-8e57-588cdf83d9c5")
+	)
+	(embedded_fonts no)
+)
