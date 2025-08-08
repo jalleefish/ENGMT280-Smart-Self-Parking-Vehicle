@@ -4,10 +4,10 @@
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "Batt Holder"
-		(at 0 -5.08 0)
+		(at 0 -2.794 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "7b9ac566-a1c3-4c3b-b57f-a1cec45fb8c2")
+		(uuid "23893b77-7f53-4e36-9e95-212cb86655d7")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,8 @@
 		(at 0 -2.54 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "a438445c-e754-4a0e-8e79-ef047f608252")
+		(hide yes)
+		(uuid "65659f6b-2ab5-4b72-8772-c500d6352c50")
 		(effects
 			(font
 				(size 1 1)
@@ -32,7 +33,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "94bae90b-f625-40e1-9d93-f0bafea843a0")
+		(uuid "d1caba3a-9322-4371-8f45-63227858d088")
 		(effects
 			(font
 				(size 1 1)
@@ -45,7 +46,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "c5c4aadc-2d4a-4326-8dca-7a4928823dd4")
+		(uuid "bc6c7330-50af-4d7d-8522-6a66dedd68df")
 		(effects
 			(font
 				(size 1 1)
@@ -54,35 +55,21 @@
 		)
 	)
 	(attr through_hole)
-	(fp_text user "LG MH1 18650"
-		(at 0 0 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(uuid "f81c08e6-6f49-4a33-8356-da417257ab41")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(pad "1" thru_hole circle
-		(at -2.54 2.54)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "1" thru_hole rect
+		(at -1.27 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "d7412351-7885-46a3-b96e-9d528836127e")
+		(uuid "f1f6bfaf-7b44-41f7-8fe7-a80032244a3c")
 	)
-	(pad "2" thru_hole circle
-		(at 0 2.54)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "2" thru_hole rect
+		(at 1.27 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "e84dcc1b-7a3a-4e31-b31a-0c5fce08ca15")
+		(uuid "c06ac68a-5266-42a6-ad27-72122634ab6f")
 	)
 	(embedded_fonts no)
 )

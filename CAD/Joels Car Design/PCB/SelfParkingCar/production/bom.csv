@@ -1,0 +1,10 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+BAT1,18650 Battery Holder,1,~,
+"CAM1, CAM3",ESP32 Camera,2,~,
+CAM2,ESP32-CAM,1,ESP32-CAM,
+DRV1,DRV8835 Motor Driver,1,~,
+MOT1,N20 Motor,1,~,
+"RNG1, RNG2, RNG3, RNG4, RNG5",Range Sensor,5,~,
+SER1,S-G90 Servo,1,~,
+U1,ESP32-DevKitC,1,ESP32-DevKitC,
+"VREG1, VREG2",S13V30F5 Voltage Regulator,2,~,

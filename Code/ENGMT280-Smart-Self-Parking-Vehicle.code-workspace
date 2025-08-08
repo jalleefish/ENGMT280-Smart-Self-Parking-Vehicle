@@ -1,7 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "../ESP32 Camera Code"
+		},
+		{
+			"path": "../ESP32 Main Code"
+		},
+		{
+			"path": "../Image Processing Code"
 		}
 	],
 	"settings": {}

@@ -4,7 +4,7 @@
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "RNG SEN"
-		(at 0 -0.5 0)
+		(at 0 -2.54 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "34a625ea-2114-451c-a197-a02fb1ba5b6d")
@@ -19,6 +19,7 @@
 		(at 0 1 0)
 		(unlocked yes)
 		(layer "F.Fab")
+		(hide yes)
 		(uuid "252933a9-3d1a-4936-b2c6-676f194c094e")
 		(effects
 			(font
@@ -54,44 +55,29 @@
 		)
 	)
 	(attr through_hole)
-	(fp_text user "3V-5V"
-		(at 0 2.5 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(uuid "0a8e2d65-a6f7-49db-934a-218a6cf63b7f")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(pad "1" thru_hole circle
-		(at -2.54 5.08)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "1" thru_hole rect
+		(at -2.54 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "75eceeaf-214f-40aa-8a40-1d32db1275fe")
+		(uuid "5e353045-1071-459a-8df8-18ebce98f86f")
 	)
-	(pad "2" thru_hole circle
-		(at 0 5.08)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "2" thru_hole rect
+		(at 0 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "1e3ecb23-2a23-4e34-8750-dbeaf8a2aebf")
+		(uuid "28ebaeb4-8859-4333-8154-7c7546bfc58b")
 	)
-	(pad "3" thru_hole circle
-		(at 2.54 5.08)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "3" thru_hole rect
+		(at 2.54 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "f1d80a0b-62b0-4fa7-93dc-e6f5c3ba3270")
+		(uuid "ca54d298-f439-4e08-93e3-e1604a69347f")
 	)
 	(embedded_fonts no)
 )

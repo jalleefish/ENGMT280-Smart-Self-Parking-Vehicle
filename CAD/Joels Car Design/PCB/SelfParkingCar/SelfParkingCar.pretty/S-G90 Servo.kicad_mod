@@ -19,6 +19,7 @@
 		(at 0 -1.04 0)
 		(unlocked yes)
 		(layer "F.Fab")
+		(hide yes)
 		(uuid "65c64ec3-cfd8-4503-b83d-4bbb788cc953")
 		(effects
 			(font
@@ -54,44 +55,29 @@
 		)
 	)
 	(attr through_hole)
-	(fp_text user "4.8V-6V"
-		(at 0 0.46 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(uuid "3c48a9ca-fccc-4dda-88db-a0bd179710a1")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(pad "1" thru_hole circle
-		(at -2.54 2.54)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "1" thru_hole rect
+		(at -2.54 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "5dd35a3f-b686-4398-9280-562b41b5f173")
+		(uuid "b77609c5-f53d-483e-988e-d2da3fb00bc7")
 	)
-	(pad "2" thru_hole circle
-		(at 0 2.54)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "2" thru_hole rect
+		(at 0 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "9866b55e-7cdf-41ee-955a-15b2ee1032d3")
+		(uuid "e44e412c-c967-4ce5-be5e-9c57327b18c5")
 	)
-	(pad "3" thru_hole circle
-		(at 2.54 2.54)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "3" thru_hole rect
+		(at 2.54 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "f9d12eb8-2137-4a4d-8e57-588cdf83d9c5")
+		(uuid "0127e61d-d034-42ca-b284-0f06def2f2a0")
 	)
 	(embedded_fonts no)
 )

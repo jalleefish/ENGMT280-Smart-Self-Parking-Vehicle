@@ -4,7 +4,7 @@
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "ESP CAM"
-		(at 0 -0.5 0)
+		(at 0 -2.54 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "3638a527-89db-42fe-90c9-566a7d3cff73")
@@ -19,6 +19,7 @@
 		(at 0 1 0)
 		(unlocked yes)
 		(layer "F.Fab")
+		(hide yes)
 		(uuid "9107b346-f010-4244-b002-1de767eb0b68")
 		(effects
 			(font
@@ -54,35 +55,21 @@
 		)
 	)
 	(attr through_hole)
-	(fp_text user "3V-5V"
-		(at 0 2.5 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(uuid "8077f4d9-07a6-41a2-acec-35678d73499e")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(pad "1" thru_hole circle
-		(at -2.54 5.08)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "1" thru_hole rect
+		(at -1.27 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "0f0e3f57-d1c8-4f34-89e7-1f3f28b44818")
+		(uuid "c3d346ac-80d1-4f46-a477-35662b56080e")
 	)
-	(pad "2" thru_hole circle
-		(at 0 5.08)
-		(size 1.4 1.4)
-		(drill 1.02)
+	(pad "2" thru_hole rect
+		(at 1.27 0)
+		(size 1.7 1.7)
+		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
-		(clearance 0)
-		(uuid "f45c60ba-7330-46e5-88a2-153997f867b1")
+		(uuid "172f79cf-f689-4b4b-a12c-1d6a861a5265")
 	)
 	(embedded_fonts no)
 )
