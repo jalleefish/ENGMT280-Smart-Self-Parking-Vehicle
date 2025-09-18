@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 //Outputs
-
+extern long distances[5];  // Distances from sensors in mm
 
 //Functions
 void setupDist();          // Setup distance sensors

@@ -16,7 +16,8 @@ void setup() {
 }
 
 void loop() {
-    sendComms();
     updateDist();
-    delay(1000);
+    sendComms();
+    receiveComms();
+    delay(300);
 }

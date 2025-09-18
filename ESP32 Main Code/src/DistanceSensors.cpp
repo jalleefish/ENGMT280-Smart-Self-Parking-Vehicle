@@ -4,6 +4,8 @@
 #include "DistanceSensors.h"
 #include <Arduino.h>
 
+long distances[5] = {0, 0, 0, 0, 0};  // define the global array
+
 void setupDist() {
   // Initialize distance sensor pins
   pinMode(DistPin1, INPUT);
@@ -22,16 +24,16 @@ long readDistance(uint8_t pin) {
 }
 
 void updateDist() {
-  long d1 = readDistance(DistPin1);
-  long d2 = readDistance(DistPin2);
-  long d3 = readDistance(DistPin3);
-  long d4 = readDistance(DistPin4);
-  long d5 = readDistance(DistPin5);
+    distances[0] = readDistance(DistPin1);
+    distances[1] = readDistance(DistPin2);
+    distances[2] = readDistance(DistPin3);
+    distances[3] = readDistance(DistPin4);
+    distances[4] = readDistance(DistPin5);
 
-  Serial.println("Distances (mm): ");
-  if (d1 < 0) Serial.println("d1: NR"); else Serial.println("d1: " + String(d1));
-  if (d2 < 0) Serial.println("d2: NR"); else Serial.println("d2: " + String(d2));
-  if (d3 < 0) Serial.println("d3: NR"); else Serial.println("d3: " + String(d3));
-  if (d4 < 0) Serial.println("d4: NR"); else Serial.println("d4: " + String(d4));
-  if (d5 < 0) Serial.println("d5: NR"); else Serial.println("d5: " + String(d5));
+    // optional debug
+    Serial.print("Distances (mm): ");
+    for (int i = 0; i < 5; i++) {
+        Serial.print(distances[i]);
+        Serial.print(i < 4 ? ", " : "\n");
+    }
 }

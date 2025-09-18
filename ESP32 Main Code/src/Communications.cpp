@@ -5,7 +5,7 @@
 #include "DistanceSensors.h"
 #include "MotorControl.h"
 #include "ServoMotorControl.h"
-#include "communications.h"
+#include "Communications.h"
 #include <WiFi.h>
 
 WiFiClient client;
@@ -22,7 +22,6 @@ void setupComms() {
 }
 
 void sendComms() {
-  Serial.println("Sending communications data...");
     if (!client.connected()) {
       Serial.println("Connecting to server...");
       if (!client.connect(host, port)) {
@@ -31,7 +30,15 @@ void sendComms() {
       }
       Serial.println("Connected!");
   }
-  
+
+    String msg = "[";
+    for (int i = 0; i < 5; i++) {
+        msg += String(distances[i]);
+        if (i < 4) msg += ",";
+    }
+    msg += "]\n";   // newline important for Python parsing
+    client.print(msg);
+    Serial.println("Sent: " + msg);
 }
 
 void receiveComms() {

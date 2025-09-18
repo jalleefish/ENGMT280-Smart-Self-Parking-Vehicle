@@ -22,5 +22,5 @@ const int  ServoPin = 2;  // servo motor 1 control pin
 // Replace with your network credentials
 const char* ssid = "JOELS-LAPTOP";  // Enter SSID here
 const char* password = "28075851";  //Enter Password here
-const char* host = "192.168.1.100";  // your laptop's IP
+const char* host = "192.168.137.1";  // your laptop's IP
 const int port = 5000;
