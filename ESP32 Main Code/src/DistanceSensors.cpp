@@ -28,10 +28,10 @@ void updateDist() {
   long d4 = readDistance(DistPin4);
   long d5 = readDistance(DistPin5);
 
-  Serial.print("Distances (mm): ");
-  Serial.print(d1 < 0 ? "NR" : String(d1)); Serial.print(" ");
-  Serial.print(d2 < 0 ? "NR" : String(d2)); Serial.print(" ");
-  Serial.print(d3 < 0 ? "NR" : String(d3)); Serial.print(" ");
-  Serial.print(d4 < 0 ? "NR" : String(d4)); Serial.print(" ");
-  Serial.println(d5 < 0 ? "NR" : String(d5));
+  Serial.println("Distances (mm): ");
+  if (d1 < 0) Serial.println("d1: NR"); else Serial.println("d1: " + String(d1));
+  if (d2 < 0) Serial.println("d2: NR"); else Serial.println("d2: " + String(d2));
+  if (d3 < 0) Serial.println("d3: NR"); else Serial.println("d3: " + String(d3));
+  if (d4 < 0) Serial.println("d4: NR"); else Serial.println("d4: " + String(d4));
+  if (d5 < 0) Serial.println("d5: NR"); else Serial.println("d5: " + String(d5));
 }

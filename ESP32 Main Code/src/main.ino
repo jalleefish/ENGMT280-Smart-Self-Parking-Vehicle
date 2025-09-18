@@ -5,22 +5,18 @@
 #include "DistanceSensors.h"
 #include "MotorControl.h"
 #include "ServoMotorControl.h"
+#include "communications.h"
 
 void setup() {
     Serial.begin(115200);
     setupDist();
     setupMotor();
     setupServo();
+    setupComms();
 }
 
 void loop() {
+    sendComms();
     updateDist();
-    motorForward();  // test run
     delay(1000);
-    motorStop();
-    delay(100);  // Adjust delay as needed
-    servoLeft();  // test servo motor
-    servoRight();  // test servo motor
-    delay(1000);
-    servoMiddle();  // reset servo motor to middle position
 }

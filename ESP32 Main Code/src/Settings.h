@@ -16,3 +16,9 @@ extern const int  MotorPin2;  // motor 2 control pin
 
 // Servo Motor Pins
 extern const int  ServoPin;  // servo motor 1 control pin
+
+// Wi-Fi Credentials
+extern const char* ssid;        // Enter SSID here
+extern const char* password;    //Enter Password here
+extern const char* host;        // your laptop's IP
+extern const int port;          // server port
