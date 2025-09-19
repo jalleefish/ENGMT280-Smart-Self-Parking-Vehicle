@@ -29,11 +29,4 @@ void updateDist() {
     distances[2] = readDistance(DistPin3);
     distances[3] = readDistance(DistPin4);
     distances[4] = readDistance(DistPin5);
-
-    // optional debug
-    Serial.print("Distances (mm): ");
-    for (int i = 0; i < 5; i++) {
-        Serial.print(distances[i]);
-        Serial.print(i < 4 ? ", " : "\n");
-    }
 }

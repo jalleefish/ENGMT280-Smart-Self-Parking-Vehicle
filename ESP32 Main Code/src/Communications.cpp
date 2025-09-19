@@ -42,6 +42,32 @@ void sendComms() {
 }
 
 void receiveComms() {
-  Serial.println("Receiving communications data...");
+    if (client.connected() && client.available()) {
+        String cmd = client.readStringUntil('\n');
+        cmd.trim();
+        Serial.println("Received command: " + cmd);
 
+        if (cmd ==  "motorReverse") {
+            client.print(cmd + "\n");
+            motorReverse();
+        } else if (cmd == "motorForward") {
+            client.print(cmd + "\n");
+            motorForward();
+        } else if (cmd == "motorStop") {
+            client.print(cmd + "\n");
+            motorStop();
+        } else if (cmd == "servoLeft") {
+            client.print(cmd + "\n");
+            servoLeft();
+        } else if (cmd == "servoRight") {
+            client.print(cmd + "\n");
+            servoRight();
+        } else if (cmd == "servoMiddle") {
+            client.print(cmd + "\n");
+            servoMiddle();
+        } else {
+            client.print(cmd + "\n");
+            Serial.println("Unknown command: " + cmd);
+        }
+    }
 }
