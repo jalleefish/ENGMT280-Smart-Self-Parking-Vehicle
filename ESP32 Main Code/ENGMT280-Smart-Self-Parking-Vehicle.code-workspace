@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../System Logic"
+		},
+		{
+			"path": "../ESP32 Camera Code"
+		},
+		{
+			"path": "../Image Processing Code"
 		}
 	],
 	"settings": {}
