@@ -8,9 +8,6 @@
 		},
 		{
 			"path": "../ESP32 Camera Code"
-		},
-		{
-			"path": "../Image Processing Code"
 		}
 	],
 	"settings": {}
