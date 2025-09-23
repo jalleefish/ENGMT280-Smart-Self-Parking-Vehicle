@@ -2718,6 +2718,28 @@
 	)
 	(global_label "SER1"
 		(shape input)
+		(at 97.79 59.69 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "8d557fe6-fa3c-478c-b707-408a6829e3d5")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 89.9668 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "SER1"
+		(shape input)
 		(at 193.04 49.53 180)
 		(fields_autoplaced yes)
 		(effects
