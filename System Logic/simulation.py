@@ -97,7 +97,7 @@ while run:
     else: dAngle = dist/adj
 
     carAngle -= dAngle
-
+    
     rearcarPos = [rearcarPos[0] + dist*np.cos(carAngle), rearcarPos[1] - dist*np.sin(carAngle)]
 
     carPos = [rearcarPos[0] + 120*np.cos(carAngle), rearcarPos[1] - 120*np.sin(carAngle)]
@@ -135,7 +135,7 @@ while run:
     pg.draw.line(disp, black, wheel2Front, wheel2Back, 6)
     pg.draw.line(disp, black, wheel3Front, wheel3Back, 6)
     pg.draw.line(disp, black, wheel4Front, wheel4Back, 6)
-
+    
     pg.Surface.fill(scrn, white)
     scrn.blit(background, (0, 0))
     scrn.blit(disp, (0, 0))
@@ -170,7 +170,7 @@ while run:
                         colourTarget.append(colour)
                 scan = False
                 break
-
+                        
             if colour == black:
                 #print('black')
                 colourSeen = False
@@ -183,7 +183,7 @@ while run:
             scan = True
         if not(target == 0):
             parking = True
-
+        
         if steering:
             steeringAngleDeg = 26
 
@@ -193,7 +193,7 @@ while run:
                     steering = False
                     if not leavePark:
                         turnPos = carPos[1]
-
+            
             if np.isclose(carAngle, 0, atol = 0.005):
                 if leavePark:
                     steeringAngleDeg = 0
@@ -203,7 +203,7 @@ while run:
                     leavePark = False
                     secondPark = True
                     firstPark = False
-
+                
         else:
             steeringAngle = 0
 
@@ -247,10 +247,10 @@ while run:
 
         if not(target == 0):
             parking = True
-
+        
         if not parking:
             scan = True
-
+        
         if steering:
             steeringAngleDeg = 26
 
@@ -258,7 +258,7 @@ while run:
                 if parking and reversing:
                     steeringAngleDeg = 0
                     steering = False
-
+                    
             if np.isclose(carAngle, 0, atol = 0.005):
                 if leavePark:
                     steeringAngleDeg = 0
@@ -266,7 +266,7 @@ while run:
                     scan = False
                     go = True
                     leavePark = False
-
+                
         else:
             steeringAngle = 0
 
@@ -290,8 +290,10 @@ while run:
                     steering = True
                     scan = False
                     go = False
-
+        
         if go:
             throttlePercentage = 20
 
 
+
+         

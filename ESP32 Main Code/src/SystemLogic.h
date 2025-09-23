@@ -1,0 +1,11 @@
+// SystemLogic.h
+// This file contains the declarations of system logic functionalities for the Self Parking Car project.
+#pragma once
+#include <Arduino.h>
+
+//Outputs
+
+
+//Functions
+void setupSystemLogic();   // Setup system logic
+void runSystemLogic();     // Run system logic loop

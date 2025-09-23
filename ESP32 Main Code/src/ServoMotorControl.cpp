@@ -1,8 +1,12 @@
 // ServoMotorControl.cpp
 // This file contains the implementation of servo motor functionalities for the Self Parking Car project.
-#include "ServoMotorControl.h"
-#include "Settings.h"
 #include <Arduino.h>
+#include "Settings.h"
+#include "DistanceSensors.h"
+#include "MotorControl.h"
+#include "ServoMotorControl.h"
+#include "Communications.h"
+#include "SystemLogic.h"
 #include <ESP32Servo.h>
 
 Servo myServo;

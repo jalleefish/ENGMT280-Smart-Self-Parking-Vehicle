@@ -5,7 +5,8 @@
 #include "DistanceSensors.h"
 #include "MotorControl.h"
 #include "ServoMotorControl.h"
-#include "communications.h"
+#include "Communications.h"
+#include "SystemLogic.h"
 
 void setup() {
     Serial.begin(115200);

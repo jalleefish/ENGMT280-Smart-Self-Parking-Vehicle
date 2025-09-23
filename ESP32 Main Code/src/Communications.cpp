@@ -6,6 +6,7 @@
 #include "MotorControl.h"
 #include "ServoMotorControl.h"
 #include "Communications.h"
+#include "SystemLogic.h"
 #include <WiFi.h>
 
 WiFiClient client;

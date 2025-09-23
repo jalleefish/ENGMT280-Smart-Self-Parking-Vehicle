@@ -4,6 +4,8 @@
 #include "DistanceSensors.h"
 #include "MotorControl.h"
 #include "ServoMotorControl.h"
+#include "Communications.h"
+#include "SystemLogic.h"
 
 // Distance Sensor Pins
 const uint8_t  DistPin1 = 4;  // sensor 1 OUT pin
