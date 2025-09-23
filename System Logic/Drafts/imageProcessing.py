@@ -24,7 +24,12 @@ while True:
     lowerRed2 = np.array([160, 100, 50])
     upperRed2 = np.array([180, 255, 255])
     
+<<<<<<< Updated upstream:System Logic/Drafts/imageProcessing.py
     # Create ranges for each color
+=======
+    
+    # Create masks for each color
+>>>>>>> Stashed changes:Image Processing Code/imageProcessing.py
     blue = cv2.inRange(hsv, lowerBlue, upperBlue)
     green = cv2.inRange(hsv, lowerGreen, upperGreen)
     yellow = cv2.inRange(hsv, lowerYellow, upperYellow)
@@ -70,16 +75,27 @@ while True:
                 cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 
     # Display the processed images
+<<<<<<< Updated upstream:System Logic/Drafts/imageProcessing.py
     # cv2.imshow('Original', bgr)
+=======
+    cv2.imshow('Original', bgr)
+>>>>>>> Stashed changes:Image Processing Code/imageProcessing.py
     #cv2.imshow('Blue Only', blue)
     #.imshow('Green Only', green)
     #.imshow('Yellow Only', yellow)
     #cv2.imshow('Red Only', red)
 
+<<<<<<< Updated upstream:System Logic/Drafts/imageProcessing.py
     # cv2.imshow('Blue Mask', blueMask)
     # cv2.imshow('Green Mask', greenMask)
     # cv2.imshow('Yellow Mask', yellowMask)
     # cv2.imshow('Red Mask', redMask)
+=======
+    cv2.imshow('Blue Mask', blueMask)
+    cv2.imshow('Green Mask', greenMask)
+    cv2.imshow('Yellow Mask', yellowMask)
+    cv2.imshow('Red Mask', redMask)
+>>>>>>> Stashed changes:Image Processing Code/imageProcessing.py
 
     # Wait 1ms and check for 'q' key to quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
