@@ -31,29 +31,5 @@ while True:
             
     conn.sendall(b"steering 123\n")
     print("Servo Right")
-    
-    time.sleep(1)
-    
-    conn.sendall(b"steering 98\n")
-    print("Servo Middle")
-    
-    time.sleep(1)
-
-    # # Only process if distances array is valid
-    # if len(distances) == 5:
-    #     if distances[1] < 20:
-    #         conn.sendall(b"motorReverse\n")
-    #         conn.sendall(b"servoMiddle\n")
-    #         print("Too close to front, reversing")
-    #     elif distances[3] < 20 or distances[4] < 20:
-    #         conn.sendall(b"motorForward\n")
-    #         conn.sendall(b"servoMiddle\n")
-    #         print("Too close to left, moving forward")
-    #     elif distances[0] < 20:
-    #         conn.sendall(b"servoLeft\n")
-    #         print("Too close to right, turning left")
-    #     elif distances[2] < 20:
-    #         conn.sendall(b"servoRight\n")
-    #         print("Too close to back, turning right")
 
     time.sleep(0.1)

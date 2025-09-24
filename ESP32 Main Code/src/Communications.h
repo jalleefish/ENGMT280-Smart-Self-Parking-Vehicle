@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 //Outputs
-
+extern String sender;
 
 //Functions
 void setupComms();          // Setup communications

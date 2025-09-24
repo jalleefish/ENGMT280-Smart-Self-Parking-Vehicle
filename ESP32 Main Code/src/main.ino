@@ -14,19 +14,12 @@ void setup() {
     setupMotor();
     setupServo();
     setupComms();
+    setupSystemLogic();
 }
 
 void loop() {
     updateDist();
-    sendComms();
     receiveComms();
-    // servoMiddle();
-    // motorForward();
-    // delay(1000);
-    // // servoLeft();
-    // motorReverse();
-    // delay(1000);
-    // // servoRight();
-    // motorStop();
-    delay(200);
+    runSystemLogic();
+    delay(20);
 }

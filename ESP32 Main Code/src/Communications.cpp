@@ -11,6 +11,8 @@
 
 WiFiClient client;
 
+String sender = "";
+
 void setupComms() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -32,14 +34,8 @@ void sendComms() {
       Serial.println("Connected!");
   }
 
-    String msg = "[";
-    for (int i = 0; i < 5; i++) {
-        msg += String(distances[i]);
-        if (i < 4) msg += ",";
-    }
-    msg += "]\n";   // newline important for Python parsing
-    client.print(msg);
-    Serial.println("Sent: " + msg);
+    client.print(sender + "\n");
+    Serial.println("Sent: " + sender);
 }
 
 void receiveComms() {
