@@ -22,25 +22,13 @@ void setupServo() {
 	// using default min/max of 1000us and 2000us
 	// different servos may require different min/max settings
 	// for an accurate 0 to 180 sweep
-    myServo.write(90);  // Move to 0 degrees
+    myServo.write(98);  // Move to 0 degrees
     Serial.println("Servo motor initialized");
     delay(15);        // wait for a second
 }
 
-void servoLeft() {
-    myServo.write(70);   // Min angle
-    Serial.println("Servo moved to left position");
-    delay(15);
-}
-
-void servoRight() {
-    myServo.write(110); // Max angle
-    Serial.println("Servo moved to right position");
-    delay(15);
-}
-
-void servoMiddle() {
-    myServo.write(90);  // Middle position
-    Serial.println("Servo moved to middle position");
-    delay(15);
+void steering(int degree) {
+    if (degree < 73) degree = 73;
+    if (degree > 123) degree = 123;
+    myServo.write(degree);
 }

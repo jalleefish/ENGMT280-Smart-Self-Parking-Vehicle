@@ -10,23 +10,23 @@
 
 void setup() {
     Serial.begin(115200);
-    // setupDist();
+    setupDist();
     setupMotor();
     setupServo();
-    // setupComms();
+    setupComms();
 }
 
 void loop() {
-    // updateDist();
-    // sendComms();
-    // receiveComms();
-    servoMiddle();
-    motorForward();
-    delay(1000);
-    servoLeft();
-    motorReverse();
-    delay(1000);
-    servoRight();
-    motorStop();
-    delay(1000);
+    updateDist();
+    sendComms();
+    receiveComms();
+    // servoMiddle();
+    // motorForward();
+    // delay(1000);
+    // // servoLeft();
+    // motorReverse();
+    // delay(1000);
+    // // servoRight();
+    // motorStop();
+    delay(200);
 }

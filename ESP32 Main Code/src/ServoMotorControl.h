@@ -4,6 +4,4 @@
 
 // Functions
 void setupServo();
-void servoMiddle();
-void servoLeft();
-void servoRight();
+void steering(int degree);

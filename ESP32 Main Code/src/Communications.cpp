@@ -52,14 +52,9 @@ void receiveComms() {
             motorReverse();
         } else if (cmd == "motorForward") {
             motorForward();
-        } else if (cmd == "motorStop") {
-            motorStop();
-        } else if (cmd == "servoLeft") {
-            servoLeft();
-        } else if (cmd == "servoRight") {
-            servoRight();
-        } else if (cmd == "servoMiddle") {
-            servoMiddle();
+        } else if (cmd.startsWith("steering")) {
+            int degree = cmd.substring(8).toInt();
+            steering(degree);
         } else {
             Serial.println("Unknown command: " + cmd);
         }
