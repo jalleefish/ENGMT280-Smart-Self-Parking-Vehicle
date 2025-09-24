@@ -15,11 +15,11 @@ const uint8_t  DistPin4 = 32;  // sensor 4 OUT pin
 const uint8_t  DistPin5 = 33;  // sensor 5 OUT pin
 
 // Motor Pins
-const int  MotorPin1 = 18;  // motor 1 control pin
-const int  MotorPin2 = 19;  // motor 2 control pin
+const int  MotorDirection = 18;  // High=forward, Low=reverse
+const int  MotorSpeed = 19;  // High=on, Low=off
 
 // Servo Motor Pins
-const int  ServoPin = 2;  // servo motor 1 control pin
+const int  ServoPin = 21;  // servo motor 1 control pin
 
 // Replace with your network credentials
 const char* ssid = "JOELS-LAPTOP";  // Enter SSID here

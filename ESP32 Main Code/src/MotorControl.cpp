@@ -9,27 +9,27 @@
 #include "SystemLogic.h"
 
 void setupMotor() {
-    pinMode(MotorPin1, OUTPUT);
-    pinMode(MotorPin2, OUTPUT);
-    digitalWrite(MotorPin1, LOW);
-    digitalWrite(MotorPin2, LOW);
+    pinMode(MotorDirection, OUTPUT);
+    pinMode(MotorSpeed, OUTPUT);
+    digitalWrite(MotorDirection, LOW);
+    digitalWrite(MotorSpeed, LOW);
     Serial.println("Motor control pins initialized");
 }
 
 void motorForward() {
-    digitalWrite(MotorPin1, HIGH);
-    digitalWrite(MotorPin2, LOW);
+    digitalWrite(MotorDirection, HIGH);
+    digitalWrite(MotorSpeed, HIGH);
     Serial.println("Motor moving forward");
 }
 
 void motorReverse() {
-    digitalWrite(MotorPin1, LOW);
-    digitalWrite(MotorPin2, HIGH);
+    digitalWrite(MotorDirection, LOW);
+    digitalWrite(MotorSpeed, HIGH);
     Serial.println("Motor reversing");
 }
 
 void motorStop() {
-    digitalWrite(MotorPin1, LOW);
-    digitalWrite(MotorPin2, LOW);
+    digitalWrite(MotorDirection, LOW);
+    digitalWrite(MotorSpeed, LOW);
     Serial.println("Motor stopped");
 }

@@ -11,8 +11,8 @@ extern const uint8_t  DistPin4;  // sensor 4 OUT pin
 extern const uint8_t  DistPin5;  // sensor 5 OUT pin
 
 // Motor Pins
-extern const int  MotorPin1;  // motor 1 control pin
-extern const int  MotorPin2;  // motor 2 control pin
+extern const int  MotorDirection;  // motor 1 control pin
+extern const int  MotorSpeed;  // motor 2 control pin
 
 // Servo Motor Pins
 extern const int  ServoPin;  // servo motor 1 control pin
