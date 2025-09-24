@@ -1,0 +1,193 @@
+// SystemLogic.cpp
+// Implementation of system logic functionalities for the Self Parking Car project.
+#include <Arduino.h>
+#include "Settings.h"
+#include "DistanceSensors.h"
+#include "MotorControl.h"
+#include "ServoMotorControl.h"
+#include "Communications.h"
+#include "SystemLogic.h"
+#include <ESP32Servo.h>
+
+
+
+// Limits for parking and steering
+const int MAX_ANGLE = 26;            // max steering angle (deg)
+const int PARK_DIST = 30;            // stop distance inside bay (mm)
+const int DIST_FROM_TARGET = 200;  // distance past bay before reversing (mm)
+
+/******** STATE ********/
+// Core state flags and counters
+bool runLoop   = true;    // master run flag
+bool firstPark = true;    // true until first parking complete
+bool secondPark= false;   // true if second park required
+bool reversing = false;   // true while reversing
+bool parking   = false;   // true during a parking manoeuvre
+int  targetCount = 0;     // number of detected target bays
+int  targetPos[2] = {0,0}; // recorded odometer positions of targets
+int  pseudoOdo = 0;       // simple odometer proxy
+
+// Outputs
+int motorCmd = 0;         // motor command: -1 reverse, 0 stop, 1 forward
+int turnAngle = 0;        // steering angle (deg)
+
+/******** DEVICES ********/
+Servo steeringServo;      // servo object for steering
+long distances[5] = {0,0,0,0,0}; // sensor readings array
+
+/******** DISTANCE FUNCTIONS ********/
+// Initialise distance sensor pins
+void setupDist(){
+  pinMode(DistPin1, INPUT);
+  pinMode(DistPin2, INPUT);
+  pinMode(DistPin3, INPUT);
+  pinMode(DistPin4, INPUT);
+  pinMode(DistPin5, INPUT);
+}
+
+// Read distance from a single sensor pin
+
+long readDistance(uint8_t pin){
+  uint32_t t = pulseIn(pin, HIGH, 300000); // measure pulse length
+  if (t == 0 || t > 2000) return -1;       // invalid reading
+
+  long d = 4 * (long(t) - 1000);           // convert to mm (calibrated)
+  if (d < 0) d = 0;
+  return d;
+}
+
+// Update global distances array
+void updateDist(){
+  distances[0] = readDistance(DistPin1);
+  distances[1] = readDistance(DistPin2);
+  distances[2] = readDistance(DistPin3);
+  distances[3] = readDistance(DistPin4);
+  distances[4] = readDistance(DistPin5);
+}
+
+/******** HELPERS ********/
+// Set steering angle in degrees relative to straight ahead
+void setSteering(int deg){
+  int servoDeg = 90 + constrain(deg,-MAX_ANGLE,MAX_ANGLE);
+  steeringServo.write(servoDeg);
+}
+
+// Set motor command: -1 reverse, 0 stop, 1 forward
+void setMotor(int cmd){
+  motorCmd = cmd;
+  if(cmd==0) digitalWrite(MotorSpeed,LOW);
+  else if(cmd>0){
+    digitalWrite(MotorDirection,HIGH);
+    digitalWrite(MotorSpeed,HIGH);
+
+  } else {
+    digitalWrite(MotorDirection,LOW);
+    digitalWrite(MotorSpeed,HIGH);
+  }
+}
+
+// Update pseudo odometer every 50 ms based on motor command
+void updateOdo(){
+  static long last=0;
+  if(millis()-last>50){
+    last=millis();
+    pseudoOdo += motorCmd*5; // increment/decrement depending on motor direction
+  }
+}
+
+/******** LOGIC ********/
+// Adjust steering to keep straight using left/right wall sensors
+void straightCorrection(){
+  long dR = distances[3];
+  long dL = distances[4];
+  if(dR<0 || dL<0) return; // ignore if invalid reading
+  int diff = dR - dL;
+  if(abs(diff)>10){
+    turnAngle = (diff>0) ? 5 : -5; // steer toward closer wall
+  } else {
+    turnAngle = 0; // keep straight
+  }
+  setSteering(turnAngle);
+}
+
+// Emergency stop if any sensor detects obstacle too close
+void checkEmergency(){
+  for(int i=0;i<5;i++){
+    if(distances[i] != -1 && distances[i] < 10){
+      setMotor(0);
+      runLoop = false;
+    }
+  }
+}
+
+// First parking manoeuvre
+void firstParkLogic(){
+  if(targetCount<1) return; // no bay recorded yet
+
+  // Trigger reverse when past target bay
+  if(!reversing && (pseudoOdo - targetPos[0]) > DIST_FROM_TARGET){
+    reversing = true; parking=true;
+    setMotor(-1); setSteering(MAX_ANGLE);
+  }
+
+  // While reversing, stop once inside bay
+  if(parking && reversing){
+    long rearAvg = (distances[3]+distances[4])/2;
+    if(rearAvg != -1 && rearAvg <= PARK_DIST){
+      setMotor(0);
+      reversing=false; parking=false;
+      firstPark=false; secondPark=true; // move to second stage
+    }
+  }
+}
+
+// Second parking manoeuvre (if required)
+void secondParkLogic(){
+  if(targetCount<2) return; // no second bay recorded yet
+  if(!reversing && (pseudoOdo - targetPos[1]) > DIST_FROM_TARGET){
+    reversing=true; parking=true;
+    setMotor(-1); setSteering(MAX_ANGLE);
+  }
+  if(parking && reversing){
+    long rearAvg = (distances[3]+distances[4])/2;
+    if(rearAvg != -1 && rearAvg <= PARK_DIST){
+      setMotor(0);
+      runLoop=false; // finished after second park
+    }
+  }
+}
+
+/******** ARDUINO ********/
+// Arduino setup function: initialise hardware and start moving forward
+void setup(){
+  Serial.begin(115200);
+  pinMode(MotorDirection,OUTPUT);
+  pinMode(MotorSpeed,OUTPUT);
+  steeringServo.attach(ServoPin);
+  setSteering(0);
+  setupDist();
+  setMotor(1); // start driving forward
+}
+
+// Arduino loop function: main control flow
+void loop(){
+  if(!runLoop){ setMotor(0); return; } // stop if runLoop disabled
+  updateOdo();
+  updateDist();
+  checkEmergency();
+  if(firstPark) firstParkLogic();
+  else if(secondPark) secondParkLogic();
+  else setMotor(0); // finished all tasks
+  straightCorrection();
+  delay(10); // short loop delay
+}
+
+
+void checkColourInput() {
+  if (Serial.available()) {
+    String col = Serial.readStringUntil('\\n');
+    col.trim();
+    if (col == "RED") { targetCount = 1; targetPos[0] = pseudoOdo; }
+    if (col.startsWith("BICOLOUR")) { firstPark = true; secondPark = true; }
+  }
+}
