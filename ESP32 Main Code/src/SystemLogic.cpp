@@ -89,7 +89,7 @@ void firstParkLogic(){
             if(abs(diff)>10){
                 steeringBool = true; // steer toward closer wall
             } else {
-                steeringBool = false
+                steeringBool = false;
                 steering(98); // keep straight
             }
         }
@@ -128,7 +128,7 @@ void secondParkLogic(){
             if(abs(diff)>15){
                 steeringBool = true; // steer toward closer wall
             } else {
-                steeringBool = false
+                steeringBool = false;
                 steering(98); // keep straight
             }
         }
