@@ -75,7 +75,7 @@ void firstParkLogic(){
     // Trigger reverse when past target bay
     if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
         reversing = true; steeringBool = true;
-        motorReverse(); steering(98 + MAX_ANGLE);
+        motorReverse(); steering(98 - MAX_ANGLE);
         return;
     }
 
@@ -89,6 +89,7 @@ void firstParkLogic(){
             if(abs(diff)>15){
                 steeringBool = true; // steer toward closer wall
             } else {
+                Serial.println("ABORT STEERING");
                 steeringBool = false;
                 steering(98); // keep straight
             }
@@ -117,7 +118,7 @@ void secondParkLogic(){
     int targetPos = dist2start + secondTarget * parkSpacing;
     if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
         reversing = true; steeringBool = true;
-        motorReverse(); steering(98 + MAX_ANGLE);
+        motorReverse(); steering(98 - MAX_ANGLE);
     }
     if(parking && reversing){
         if (steeringBool){
