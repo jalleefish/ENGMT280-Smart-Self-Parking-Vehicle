@@ -1,5 +1,4 @@
 import cv2, time, socket, numpy as np, threading, requests
-from PIL import Image
 
 HOST = "0.0.0.0"
 PORT = 5000
@@ -90,59 +89,121 @@ upperRed = np.array([10, 255, 255])
 lowerRed2 = np.array([160, 100, 50])
 upperRed2 = np.array([180, 255, 255])
 
+boundLenY = 60
+boundLenX = 30
+boundLowY = 200
+
+# sensor stuff
+colourCheck = 1
+colourTarget = [0, 0, 0, 0]
+coloursFound = 0
+orderedColours = []
+colours = []
+colourPos = []
+averagesR = [200]
+averagesY = [200]
+averagesG = [200]
+averagesB = [200]
+blueTarget = False
+redTarget = False
+greenTarget = False
+yellowTarget = False
+target = 0
+targetPos = []
+colourError = 10
+targetColourPos = 20
+run = True
+sender = ''
+receiver = ''
+colourScan = True
+targetNumbers = []
+firstTarget = -1
+secondTarget = -1
+
 while True:
     if clock.ready():
-        with frame_lock:
-            bgr = latest_frame  # get the most recent frame
-        if bgr is not None:
-            hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+        if sender == 'colourScan':
+            colourScan = True
+        if sender == 'noScan':
+            colourScan == False
+        if colourTarget.count(1) >= 2:
+            colourScan = False
+            break
+        if colourScan:
+            with frame_lock:
+                bgr = latest_frame  # get the most recent frame
+            if bgr is not None:
+                hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
-            # Create ranges for each color
-            blue = cv2.inRange(hsv, lowerBlue, upperBlue)
-            green = cv2.inRange(hsv, lowerGreen, upperGreen)
-            yellow = cv2.inRange(hsv, lowerYellow, upperYellow)
-            red1 = cv2.inRange(hsv, lowerRed, upperRed)
-            red2 = cv2.inRange(hsv, lowerRed2, upperRed2)
-            red = red1 + red2  # Combine the two red masks
+                # Create ranges for each color
+                blue = cv2.inRange(hsv, lowerBlue, upperBlue)
+                green = cv2.inRange(hsv, lowerGreen, upperGreen)
+                yellow = cv2.inRange(hsv, lowerYellow, upperYellow)
+                red1 = cv2.inRange(hsv, lowerRed, upperRed)
+                red2 = cv2.inRange(hsv, lowerRed2, upperRed2)
+                red = red1 + red2  # Combine the two red masks
 
-            # # Create masks for each color
-            # blueMask = cv2.bitwise_and(bgr, bgr, mask=blue)
-            # greenMask = cv2.bitwise_and(bgr, bgr, mask=green)
-            # yellowMask = cv2.bitwise_and(bgr, bgr, mask=yellow)
-            # redMask = cv2.bitwise_and(bgr, bgr, mask=red)
-            
-            # Find contours for each color mask
-            blueContours, blueHierarchy=cv2.findContours(blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            greenContours, greenHierarchy=cv2.findContours(green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            yellowContours, yellowHierarchy=cv2.findContours(yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            redContours, redHierarchy=cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
-                # Draw rectangles around detected contours
-            if len(blueContours) != 0:
-                for blueContour in blueContours:
-                    if cv2.contourArea(blueContour) > 500:
-                        x, y, w, h = cv2.boundingRect(blueContour)
-                        cv2.rectangle(bgr, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                        
-            if len(greenContours) != 0:
-                for greenContour in greenContours:
-                    if cv2.contourArea(greenContour) > 500:
-                        x, y, w, h = cv2.boundingRect(greenContour)
-                        cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        
-            if len(yellowContours) != 0:
-                for yellowContour in yellowContours:
-                    if cv2.contourArea(yellowContour) > 500:
-                        x, y, w, h = cv2.boundingRect(yellowContour)
-                        cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 255), 2)
-                        
-            if len(redContours) != 0:
-                for redContour in redContours:
-                    if cv2.contourArea(redContour) > 500:
-                        x, y, w, h = cv2.boundingRect(redContour)
-                        cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                        
-            cv2.imshow('Original', bgr)
+                # # Create masks for each color
+                # blueMask = cv2.bitwise_and(bgr, bgr, mask=blue)
+                # greenMask = cv2.bitwise_and(bgr, bgr, mask=green)
+                # yellowMask = cv2.bitwise_and(bgr, bgr, mask=yellow)
+                # redMask = cv2.bitwise_and(bgr, bgr, mask=red)
+                
+                # Find contours for each color mask
+                blueContours, blueHierarchy=cv2.findContours(blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                greenContours, greenHierarchy=cv2.findContours(green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                yellowContours, yellowHierarchy=cv2.findContours(yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                redContours, redHierarchy=cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                
+                    # Draw rectangles around detected contours
+                if len(blueContours) != 0:
+                    for blueContour in blueContours:
+                        if cv2.contourArea(blueContour) > 500:
+                            x, y, w, h = cv2.boundingRect(blueContour)
+                            cv2.rectangle(bgr, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                            
+                if len(greenContours) != 0:
+                    for greenContour in greenContours:
+                        if cv2.contourArea(greenContour) > 500:
+                            x, y, w, h = cv2.boundingRect(greenContour)
+                            cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            
+                if len(yellowContours) != 0:
+                    for yellowContour in yellowContours:
+                        if cv2.contourArea(yellowContour) > 500:
+                            x, y, w, h = cv2.boundingRect(yellowContour)
+                            cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 255), 2)
+                            
+                if len(redContours) != 0:
+                    for redContour in redContours:
+                        if cv2.contourArea(redContour) > 500:
+                            x, y, w, h = cv2.boundingRect(redContour)
+                            cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                            
+                cv2.imshow('Original', bgr)
+                
+                while not(colours == []):
+                    coloursX = [sublist[1] for sublist in colours]
+                    firstColour = max(coloursX)
+                    firstColourIndex = coloursX.index(firstColour)
+                    orderedColours.append(colours.pop(firstColourIndex))
+                    print(orderedColours[-1])
+                if len(orderedColours) > 2:
+                    for i in range(2, len(orderedColours)):
+                        if (i - 2) not in targetNumbers:
+                            if orderedColours[i][0] == orderedColours[0][0] or orderedColours[i][0] == orderedColours[1][0]:
+                                if len(targetNumbers) < 2:
+                                    targetNumbers.append(i - 2)
+                                    
+            if len(targetNumbers) >= 1:
+                firstTarget = targetNumbers[0]
+                msg = f"setFirstTarget:{firstTarget}\n"
+                conn.sendall(msg.encode())
+
+            if len(targetNumbers) == 2:
+                secondTarget = targetNumbers[1]
+                msg = f"setSecondTarget:{secondTarget}\n"
+                conn.sendall(msg.encode())    
         else:
             print("Failed to decode image")
 
