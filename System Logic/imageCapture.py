@@ -198,7 +198,7 @@ while True:
                 while not(colours == []):
                     print('found colour')
                     for i in range(0, len(colours)):
-                        ave = colours[1] + colours[3]/2
+                        ave = colours[i][1] + colours[i][3]/2
                         coloursAve.append(ave)
 
                     closest_value = coloursAve[1]
