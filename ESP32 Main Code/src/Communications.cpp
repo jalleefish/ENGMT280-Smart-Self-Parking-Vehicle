@@ -52,8 +52,10 @@ void receiveComms() {
             
             if (cmd == "setFirstTarget") {
                 firstTarget = value;
+                Serial.println("Found First Target: " + String(firstTarget));
             } else if (cmd == "setSecondTarget") {
                 secondTarget = value;
+                Serial.println("Found Second Target: " + String(secondTarget));
             } else if (cmd == "motorForward") {
                 motorForward();
             } else {
