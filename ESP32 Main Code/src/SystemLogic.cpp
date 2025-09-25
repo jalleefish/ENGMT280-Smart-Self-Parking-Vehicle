@@ -43,13 +43,7 @@ void straightCorrection(){
   if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
   else if (dS < (122-5)) turnAngle -= 1; // steer away if too close
   else turnAngle = 0;              // keep straight if just right
-  // if(dR<0 || dL<0) return; // ignore if invalid reading
-  // int diff = dR - dL;
-  // if(abs(diff)>30){
-  //   turnAngle = (diff>0) ? 5 : -5; // steer toward closer wall
-  // } else {
-  //   turnAngle = 0; // keep straight
-  // }
+
   if (abs(turnAngle) > MAX_ANGLE) {
     turnAngle = (turnAngle > 0) ? MAX_ANGLE : -MAX_ANGLE;
   }
