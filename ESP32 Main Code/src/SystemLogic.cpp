@@ -39,8 +39,8 @@ void straightCorrection(){
   long dL = distances[4];
   if(dR<0 || dL<0) return; // ignore if invalid reading
   int diff = dR - dL;
-  if(abs(diff)>20){
-    turnAngle = (diff>0) ? 10 : -10; // steer toward closer wall
+  if(abs(diff)>30){
+    turnAngle = (diff>0) ? 5 : -5; // steer toward closer wall
   } else {
     turnAngle = 0; // keep straight
   }

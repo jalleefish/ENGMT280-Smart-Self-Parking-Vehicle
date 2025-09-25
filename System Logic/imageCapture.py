@@ -80,7 +80,7 @@ threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 70, 50])
+lowerGreen = np.array([40, 70, 65])
 upperGreen = np.array([80, 255, 255])
 lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
@@ -133,6 +133,7 @@ while True:
             with frame_lock:
                 bgr = latest_frame  # get the most recent frame
             if bgr is not None:
+                centre = 160
                 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
                 # Create ranges for each color
@@ -182,11 +183,23 @@ while True:
                             
                 cv2.imshow('Original', bgr)
                 
+                coloursAve = []
                 while not(colours == []):
-                    coloursX = [sublist[1] for sublist in colours]
-                    firstColour = max(coloursX)
-                    firstColourIndex = coloursX.index(firstColour)
-                    orderedColours.append(colours.pop(firstColourIndex))
+                    for i in range(0, len(colours)):
+                        ave = colours[1] + colours[3]/2
+                        coloursAve.append(ave)
+
+                    closest_value = coloursAve[1]
+                    min_diff = abs(coloursAve[1] - centre)
+
+                    for value in coloursAve:
+                        current_diff = abs(value - centre)
+                        if current_diff < min_diff:
+                            min_diff = current_diff
+                            closest_value = value
+                    ColourIndex = coloursAve.index(closest_value)
+                    orderedColours.append(colours[ColourIndex])
+                    colours = []
                     print(orderedColours[-1])
                 if len(orderedColours) > 2:
                     for i in range(2, len(orderedColours)):
