@@ -4,7 +4,8 @@
 #include <Arduino.h>
 
 //Outputs
-
+extern int firstTarget;
+extern int secondTarget;
 
 //Functions
 void saveDistance();

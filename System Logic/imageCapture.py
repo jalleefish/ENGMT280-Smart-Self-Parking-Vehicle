@@ -10,6 +10,8 @@ print("Waiting for ESP32...")
 conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
 centre = 160
+time.sleep(0.5)  # wait for connection to stabilize
+conn.sendall(b"motorForward:0\n")
 
 buffer = ""
 
@@ -58,7 +60,7 @@ clock = Clock(interval=2)  # take snapshot every 2s
 
 latest_frame = None
 frame_lock = threading.Lock()
-url = "http://192.168.137.136/capture"
+url = "http://192.168.137.51/capture"
 
 def fetch_frames():
     global latest_frame
@@ -81,7 +83,7 @@ threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 70, 50])
+lowerGreen = np.array([40, 70, 65])
 upperGreen = np.array([80, 255, 255])
 lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
@@ -125,6 +127,7 @@ while True:
     if clock.ready():
         if sender == 'colourScan':
             colourScan = True
+            print("Starting colour scan")
         if sender == 'noScan':
             colourScan == False
         if colourTarget.count(1) >= 2:
@@ -134,6 +137,7 @@ while True:
             with frame_lock:
                 bgr = latest_frame  # get the most recent frame
             if bgr is not None:
+                centre = 160
                 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
                 # Create ranges for each color

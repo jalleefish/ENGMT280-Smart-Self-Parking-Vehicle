@@ -35,14 +35,23 @@ int turnAngle = 0;        // steering angle (deg)
 /******** LOGIC ********/
 // Adjust steering to keep straight using left/right wall sensors
 void straightCorrection(){
+  long dS = distances[2];
   long dR = distances[3];
   long dL = distances[4];
-  if(dR<0 || dL<0) return; // ignore if invalid reading
-  int diff = dR - dL;
-  if(abs(diff)>20){
-    turnAngle = (diff>0) ? 10 : -10; // steer toward closer wall
-  } else {
-    turnAngle = 0; // keep straight
+
+  if (dS < 0) return;              // ignore if no side wall
+  if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
+  else if (dS < (122-5)) turnAngle -= 1; // steer away if too close
+  else turnAngle = 0;              // keep straight if just right
+  // if(dR<0 || dL<0) return; // ignore if invalid reading
+  // int diff = dR - dL;
+  // if(abs(diff)>30){
+  //   turnAngle = (diff>0) ? 5 : -5; // steer toward closer wall
+  // } else {
+  //   turnAngle = 0; // keep straight
+  // }
+  if (abs(turnAngle) > MAX_ANGLE) {
+    turnAngle = (turnAngle > 0) ? MAX_ANGLE : -MAX_ANGLE;
   }
   steering(98+turnAngle);
 }

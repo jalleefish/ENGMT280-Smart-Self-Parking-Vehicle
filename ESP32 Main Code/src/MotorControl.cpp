@@ -11,8 +11,8 @@
 void setupMotor() {
     pinMode(MotorDirection, OUTPUT);
     pinMode(MotorSpeed, OUTPUT);
-    digitalWrite(MotorDirection, LOW);
-    digitalWrite(MotorSpeed, HIGH);
+    digitalWrite(MotorDirection, HIGH);
+    digitalWrite(MotorSpeed, LOW);
     Serial.println("Motor control pins initialized");
 }
 

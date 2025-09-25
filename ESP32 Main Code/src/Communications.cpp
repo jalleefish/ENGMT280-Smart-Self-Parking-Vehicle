@@ -54,6 +54,8 @@ void receiveComms() {
                 firstTarget = value;
             } else if (cmd == "setSecondTarget") {
                 secondTarget = value;
+            } else if (cmd == "motorForward") {
+                motorForward();
             } else {
                 Serial.println("Unknown command: " + cmd);
             }
