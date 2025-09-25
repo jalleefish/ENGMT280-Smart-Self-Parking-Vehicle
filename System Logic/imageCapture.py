@@ -26,7 +26,6 @@ def comms():
             line = line.strip()
             if line:
                 sender = line
-                print("Sender:", sender)
 
 threading.Thread(target=comms, daemon=True).start()
 
@@ -126,7 +125,7 @@ while True:
     if clock.ready():
         if sender == 'colourScan':
             colourScan = True
-            print("Starting colour scan")
+            print("Loading new frame")
         if sender == 'noScan':
             colourScan == False
         if colourTarget.count(1) >= 2:
@@ -159,7 +158,7 @@ while True:
                 yellowContours, yellowHierarchy=cv2.findContours(yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                 redContours, redHierarchy=cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                 
-                    # Draw rectangles around detected contours
+                # Draw rectangles around detected contours
                 if len(blueContours) != 0:
                     for blueContour in blueContours:
                         if cv2.contourArea(blueContour) > 500:
