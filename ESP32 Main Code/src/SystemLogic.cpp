@@ -40,9 +40,6 @@ void straightCorrection(){
   if (parking) return;
   
   long dS = distances[2];
-  long dR = distances[3];
-  long dL = distances[4];
-  if (((dL + dR) / 2) < 50) return;
 
   if (dS <0) return;              // ignore if no side wall
   if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
@@ -72,7 +69,7 @@ void firstParkLogic(){
 
     // Trigger reverse when past target bay
     if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
-        reversing = true; parking=true;
+        reversing = true; parking=true; steeringBool = true;
         motorReverse(); steering(98+MAX_ANGLE);
     }
 
@@ -86,11 +83,11 @@ void firstParkLogic(){
             if(abs(diff)>15){
                 steeringBool = true; // steer toward closer wall
             } else {
-                steeringBool = false
+                steeringBool = false;
                 turnAngle = 0; // keep straight
             }
         }
-  steering(98+turnAngle);
+        steering(98+turnAngle);
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
