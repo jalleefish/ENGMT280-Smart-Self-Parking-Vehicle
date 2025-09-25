@@ -9,6 +9,8 @@ server_socket.listen(1)
 print("Waiting for ESP32...")
 conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
+time.sleep(0.5)  # wait for connection to stabilize
+conn.sendall(b"motorForward:0\n")
 
 buffer = ""
 
@@ -57,7 +59,7 @@ clock = Clock(interval=2)  # take snapshot every 2s
 
 latest_frame = None
 frame_lock = threading.Lock()
-url = "http://192.168.137.136/capture"
+url = "http://192.168.137.51/capture"
 
 def fetch_frames():
     global latest_frame
@@ -124,6 +126,7 @@ while True:
     if clock.ready():
         if sender == 'colourScan':
             colourScan = True
+            print("Starting colour scan")
         if sender == 'noScan':
             colourScan == False
         if colourTarget.count(1) >= 2:
@@ -185,6 +188,7 @@ while True:
                 
                 coloursAve = []
                 while not(colours == []):
+                    print("getting colours")
                     for i in range(0, len(colours)):
                         ave = colours[1] + colours[3]/2
                         coloursAve.append(ave)
