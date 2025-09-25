@@ -25,6 +25,7 @@ bool secondPark= false;   // true if second park required
 bool reversing = false;   // true while reversing
 bool parking   = false;   // true during a parking manoeuvre
 bool steeringBool = false;
+bool leavePark = false;
 int  targetCount = 0;     // number of detected target bays
 int  targetPos = 0; // recorded odometer positions of targets
 bool colourScan = true;   // true to perform colour scan
@@ -40,7 +41,10 @@ void straightCorrection(){
   if (parking) return;
   
   long dS = distances[2];
-
+  long dR = distances[3];
+  long dL = distances[4];
+  if (((dL + dR) / 2) < 50) return;
+  leavePark = false;
   if (dS <0) return;              // ignore if no side wall
   if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
   else if (dS < (122-5)) turnAngle -= 1; // steer away if too close
@@ -65,12 +69,14 @@ void straightCorrection(){
 // First parking manoeuvre
 void firstParkLogic(){
     if(firstTarget == -1) return; // no bay recorded yet
+    parking = true;
     int targetPos = dist2start + firstTarget * parkSpacing;
 
     // Trigger reverse when past target bay
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
-        reversing = true; parking=true; steeringBool = true;
-        motorReverse(); steering(98+MAX_ANGLE);
+    if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
+        reversing = true; steeringBool = true;
+        motorReverse(); steering(98 + MAX_ANGLE);
+        return;
     }
 
     // While reversing, stop once inside bay
@@ -84,16 +90,15 @@ void firstParkLogic(){
                 steeringBool = true; // steer toward closer wall
             } else {
                 steeringBool = false;
-                turnAngle = 0; // keep straight
+                steering(98); // keep straight
             }
         }
-        steering(98+turnAngle);
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
         motorStop();
-        reversing=false; parking=false;
-        firstPark=false; secondPark=true; // move to second stage
+        reversing = false; parking = false; steeringBool = false; leavePark = true;
+        firstPark = false; secondPark = true; // move to second stage
         }
     if (!reversing && !steeringBool){
         colourScan = true;
@@ -103,15 +108,30 @@ void firstParkLogic(){
 
 // Second parking manoeuvre (if required)
 void secondParkLogic(){
-    colourScan = true;
+    if (!reversing && !steeringBool){
+        colourScan = true;
+        }
     if(secondTarget == -1) return; // no bay recorded yet
-    parking=true;
+    colourScan = false;
+    parking = true;
     int targetPos = dist2start + secondTarget * parkSpacing;
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
-        reversing=true; 
-        motorReverse(); steering(98+MAX_ANGLE);
+    if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
+        reversing = true; steeringBool = true;
+        motorReverse(); steering(98 + MAX_ANGLE);
     }
     if(parking && reversing){
+        if (steeringBool){
+            long dR = distances[3];
+            long dL = distances[4];
+            if(dR<0 || dL<0) return; // ignore if invalid reading
+            int diff = dR - dL;
+            if(abs(diff)>15){
+                steeringBool = true; // steer toward closer wall
+            } else {
+                steeringBool = false;
+                steering(98); // keep straight
+            }
+        }
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
         motorStop();
