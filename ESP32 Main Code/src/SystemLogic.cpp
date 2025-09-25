@@ -86,7 +86,7 @@ void firstParkLogic(){
             long dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
             int diff = dR - dL;
-            if(abs(diff)>15){
+            if(abs(diff)>10){
                 steeringBool = true; // steer toward closer wall
             } else {
                 Serial.println("ABORT STEERING");
@@ -97,9 +97,9 @@ void firstParkLogic(){
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
-        motorStop();
-        reversing = false; parking = false; steeringBool = false; leavePark = true;
-        firstPark = false; secondPark = true; // move to second stage
+            motorStop();
+            reversing = false; parking = false; steeringBool = false; leavePark = true;
+            firstPark = false; secondPark = true; // move to second stage
         }
     if (!reversing && !steeringBool){
         colourScan = true;
@@ -135,8 +135,8 @@ void secondParkLogic(){
         }
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
-        motorStop();
-        runLoop=false; // finished after second park
+            motorStop();
+            runLoop=false; // finished after second park
         }
     }
 }
@@ -144,6 +144,9 @@ void secondParkLogic(){
 // Arduino loop function: main control flow
 void runSystemLogic(){
 //   checkEmergency();
+  if (steeringBool){
+    steering(98 - MAX_ANGLE)
+  }
   if(firstPark) firstParkLogic();
   else if(secondPark) secondParkLogic();
   else motorStop(); // finished all tasks
