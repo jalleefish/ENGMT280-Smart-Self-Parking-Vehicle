@@ -12,6 +12,10 @@
 const int MAX_ANGLE = 25;            // max steering angle (deg)
 const int PARK_DIST = 30;            // stop distance inside bay (mm)
 const int DIST_FROM_TARGET = 200;  // distance past bay before reversing (mm)
+int parkSpacing = 50;
+int dist2start = 200;
+int firstTarget = -1;
+int secondTarget = -1;
 
 /******** STATE ********/
 // Core state flags and counters
@@ -21,7 +25,7 @@ bool secondPark= false;   // true if second park required
 bool reversing = false;   // true while reversing
 bool parking   = false;   // true during a parking manoeuvre
 int  targetCount = 0;     // number of detected target bays
-int  targetPos[2] = {0,0}; // recorded odometer positions of targets
+int  targetPos = 0; // recorded odometer positions of targets
 bool colourScan = true;   // true to perform colour scan
 
 // Outputs
@@ -35,7 +39,7 @@ void straightCorrection(){
   long dL = distances[4];
   if(dR<0 || dL<0) return; // ignore if invalid reading
   int diff = dR - dL;
-  if(abs(diff)>10){
+  if(abs(diff)>20){
     turnAngle = (diff>0) ? 10 : -10; // steer toward closer wall
   } else {
     turnAngle = 0; // keep straight
@@ -55,10 +59,11 @@ void straightCorrection(){
 
 // First parking manoeuvre
 void firstParkLogic(){
-    if(targetCount<1) return; // no bay recorded yet
+    if(firstTarget == -1) return; // no bay recorded yet
+    int targetPos = dist2start + firstTarget * parkSpacing;
 
     // Trigger reverse when past target bay
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos[0]) > DIST_FROM_TARGET){
+    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
         reversing = true; parking=true;
         motorReverse(); steering(98+MAX_ANGLE);
     }
@@ -81,9 +86,11 @@ void firstParkLogic(){
 // Second parking manoeuvre (if required)
 void secondParkLogic(){
     colourScan = true;
-    if(targetCount<2) return; // no second bay recorded yet
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos[1]) > DIST_FROM_TARGET){
-        reversing=true; parking=true;
+    if(secondTarget == -1) return; // no bay recorded yet
+    parking=true;
+    int targetPos = dist2start + secondTarget * parkSpacing;
+    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
+        reversing=true; 
         motorReverse(); steering(98+MAX_ANGLE);
     }
     if(parking && reversing){
@@ -92,19 +99,6 @@ void secondParkLogic(){
         motorStop();
         runLoop=false; // finished after second park
         }
-    }
-}
-
-void saveDistance() {
-    long pos = (distances[3] + distances[4]) / 2;
-    if (targetPos[0] == 0) {
-        targetPos[0] = pos;
-        Serial.println("First target saved at position: " + String(pos));
-    } else if ((targetPos[1] == 0) && (pos > targetPos[0] + 50)) {
-        targetPos[1] = pos;
-        Serial.println("Second target saved at position: " + String(pos));
-    } else if (targetPos[1] != 0) {
-        Serial.println("Two targets already saved");
     }
 }
 
