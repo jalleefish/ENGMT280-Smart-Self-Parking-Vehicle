@@ -24,6 +24,7 @@ bool firstPark = true;    // true until first parking complete
 bool secondPark= false;   // true if second park required
 bool reversing = false;   // true while reversing
 bool parking   = false;   // true during a parking manoeuvre
+bool steeringBool = false;
 int  targetCount = 0;     // number of detected target bays
 int  targetPos = 0; // recorded odometer positions of targets
 bool colourScan = true;   // true to perform colour scan
@@ -35,11 +36,15 @@ int turnAngle = 0;        // steering angle (deg)
 /******** LOGIC ********/
 // Adjust steering to keep straight using left/right wall sensors
 void straightCorrection(){
+  if (steeringBool) return;
+  if (parking) return;
+  
   long dS = distances[2];
   long dR = distances[3];
   long dL = distances[4];
+  if (((dL + dR) / 2) < 50) return;
 
-  if (dS < 0) return;              // ignore if no side wall
+  if (dS <0) return;              // ignore if no side wall
   if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
   else if (dS < (122-5)) turnAngle -= 1; // steer away if too close
   else turnAngle = 0;              // keep straight if just right
@@ -73,6 +78,19 @@ void firstParkLogic(){
 
     // While reversing, stop once inside bay
     if(parking && reversing){
+        if (steeringBool){
+            long dR = distances[3];
+            long dL = distances[4];
+            if(dR<0 || dL<0) return; // ignore if invalid reading
+            int diff = dR - dL;
+            if(abs(diff)>15){
+                steeringBool = true; // steer toward closer wall
+            } else {
+                steeringBool = false
+                turnAngle = 0; // keep straight
+            }
+        }
+  steering(98+turnAngle);
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
@@ -80,7 +98,7 @@ void firstParkLogic(){
         reversing=false; parking=false;
         firstPark=false; secondPark=true; // move to second stage
         }
-    if (!reversing && !steering){
+    if (!reversing && !steeringBool){
         colourScan = true;
     }
   }
