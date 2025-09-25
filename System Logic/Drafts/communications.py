@@ -1,7 +1,7 @@
 import socket
 import json
 import time
-import imageProcessing as imgProc
+import Drafts.imageProcessing as imgProc
 
 HOST = "0.0.0.0"
 PORT = 5000

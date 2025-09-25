@@ -8,5 +8,4 @@
 
 //Functions
 void saveDistance();
-void setupSystemLogic();   // Setup system logic
 void runSystemLogic();     // Run system logic loop

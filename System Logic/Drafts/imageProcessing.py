@@ -17,9 +17,9 @@ print(f"Connected by {addr}")
 
 buffer = ""
 
-url = 0
-# url = "http://192.168.137.249:81/stream"
-cap = cv2.VideoCapture(url)  # Open the ESP32-CAM stream
+# url = 0
+url = "http://192.168.137.136:81/stream"
+cap = cv2.imread(url)  # Open the ESP32-CAM stream
 
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
@@ -144,6 +144,8 @@ while True:
         break
     
     if colourScan:
+        time.sleep(0.5)
+        print("scanning")
         # RED
         maskR = Image.fromarray(maskRed)
         boundsR = maskR.getbbox()

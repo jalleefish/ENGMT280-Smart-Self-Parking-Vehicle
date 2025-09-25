@@ -107,15 +107,6 @@ void saveDistance() {
         Serial.println("Two targets already saved");
     }
 }
-
-
-
-// Arduino setup function: initialise hardware and start moving forward
-void setupSystemLogic(){
-    motorForward();
-    steering(0);
-}
-
 // Arduino loop function: main control flow
 void runSystemLogic(){
 //   checkEmergency();
