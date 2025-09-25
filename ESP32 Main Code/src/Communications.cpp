@@ -14,14 +14,14 @@ WiFiClient client;
 String sender = "";
 
 void setupComms() {
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(".");
+    }
+    Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
 }
 
 void sendComms() {
@@ -41,14 +41,22 @@ void sendComms() {
 
 void receiveComms() {
     if (client.connected() && client.available()) {
-        String cmd = client.readStringUntil('\n');
-        cmd.trim();
-        Serial.println("Received command: " + cmd);
-
-        if (cmd ==  "saveDistance") {
-            saveDistance();
-        } else {
-            Serial.println("Unknown command: " + cmd);
+        String line = client.readStringUntil('\n');
+        line.trim();
+        int separatorIndex = line.indexOf(':');
+        if (separatorIndex != -1) {
+            String cmd = line.substring(0, separatorIndex);
+            String valueStr = line.substring(separatorIndex + 1);
+            int value = valueStr.toInt();  // convert to int
+            Serial.println("Received command: " + cmd);
+            
+            if (cmd == "setFirstTarget") {
+                firstTarget = value;
+            } else if (cmd == "setSecondTarget") {
+                secondTarget = value;
+            } else {
+                Serial.println("Unknown command: " + cmd);
+            }
         }
     }
 }

@@ -177,11 +177,13 @@ while True:
         
     if len(targetNumbers) >= 1:
         firstTarget = targetNumbers[0]
-        conn.sendall(firstTarget.encode())
+        msg = f"setFirstTarget:{firstTarget}\n"
+        conn.sendall(msg.encode())
+
     if len(targetNumbers) == 2:
         secondTarget = targetNumbers[1]
-        conn.sendall(secondTarget.encode())
-        colourScan = False
+        msg = f"setSecondTarget:{secondTarget}\n"
+        conn.sendall(msg.encode())
 
     # Wait 1ms and check for 'q' key to quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
