@@ -14,7 +14,6 @@ void setup() {
     setupMotor();
     setupServo();
     setupComms();
-    setupSystemLogic();
 }
 
 void loop() {
