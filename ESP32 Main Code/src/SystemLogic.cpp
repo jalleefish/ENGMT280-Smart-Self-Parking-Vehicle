@@ -95,6 +95,21 @@ void secondParkLogic(){
     }
 }
 
+void saveDistance() {
+    long pos = (distances[3] + distances[4]) / 2;
+    if (targetPos[0] == 0) {
+        targetPos[0] = pos;
+        Serial.println("First target saved at position: " + String(pos));
+    } else if ((targetPos[1] == 0) && (pos > targetPos[0] + 50)) {
+        targetPos[1] = pos;
+        Serial.println("Second target saved at position: " + String(pos));
+    } else if (targetPos[1] != 0) {
+        Serial.println("Two targets already saved");
+    }
+}
+
+
+
 // Arduino setup function: initialise hardware and start moving forward
 void setupSystemLogic(){
     motorForward();

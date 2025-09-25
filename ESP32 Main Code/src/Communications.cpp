@@ -36,6 +36,7 @@ void sendComms() {
 
     client.print(sender + "\n");
     Serial.println("Sent: " + sender);
+    sender = "";
 }
 
 void receiveComms() {
@@ -44,13 +45,8 @@ void receiveComms() {
         cmd.trim();
         Serial.println("Received command: " + cmd);
 
-        if (cmd ==  "motorReverse") {
-            motorReverse();
-        } else if (cmd == "motorForward") {
-            motorForward();
-        } else if (cmd.startsWith("steering")) {
-            int degree = cmd.substring(8).toInt();
-            steering(degree);
+        if (cmd ==  "saveDistance") {
+            saveDistance();
         } else {
             Serial.println("Unknown command: " + cmd);
         }

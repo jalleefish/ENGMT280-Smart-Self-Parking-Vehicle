@@ -1,6 +1,7 @@
 import socket
 import json
 import time
+import imageProcessing as imgProc
 
 HOST = "0.0.0.0"
 PORT = 5000
@@ -13,7 +14,6 @@ conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
 
 buffer = ""
-distances = []
 
 while True:
     data = conn.recv(1024).decode()
@@ -23,13 +23,12 @@ while True:
 
     while "\n" in buffer:
         line, buffer = buffer.split("\n", 1)
-        try:
-            distances = json.loads(line)
-            print("Distances:", distances)
-        except json.JSONDecodeError:
-            print("Bad data:", line)
-            
-    conn.sendall(b"steering 123\n")
-    print("Servo Right")
+        line = line.strip()
+        if not line:
+            continue
+        imgProc.sender = line
+        
+        if imgProc.target:
+            conn.sendall("saveDistance".encode())
 
     time.sleep(0.1)
