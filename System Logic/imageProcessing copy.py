@@ -165,6 +165,7 @@ while True:
         # RED
         coloursAve = []
         while not(colours == []):
+            print('found colour')
             for i in range(0, len(colours)):
                 ave = colours[1] + colours[3]/2
                 coloursAve.append(ave)
@@ -178,8 +179,9 @@ while True:
                     min_diff = current_diff
                     closest_value = value
             ColourIndex = coloursAve.index(closest_value)
-            orderedColours.append(colours[ColourIndex])
-            colours = []
+            orderedColours.append(colours.pop(ColourIndex))
+            if len(orderedColours) > 1:
+                colours = []
             print(orderedColours[-1])
         if len(orderedColours) > 2:
             for i in range(2, len(orderedColours)):

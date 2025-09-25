@@ -9,6 +9,7 @@ server_socket.listen(1)
 print("Waiting for ESP32...")
 conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
+centre = 160
 
 buffer = ""
 
@@ -182,11 +183,25 @@ while True:
                             
                 cv2.imshow('Original', bgr)
                 
+                coloursAve = []
                 while not(colours == []):
-                    coloursX = [sublist[1] for sublist in colours]
-                    firstColour = max(coloursX)
-                    firstColourIndex = coloursX.index(firstColour)
-                    orderedColours.append(colours.pop(firstColourIndex))
+                    print('found colour')
+                    for i in range(0, len(colours)):
+                        ave = colours[1] + colours[3]/2
+                        coloursAve.append(ave)
+
+                    closest_value = coloursAve[1]
+                    min_diff = abs(coloursAve[1] - centre)
+
+                    for value in coloursAve:
+                        current_diff = abs(value - centre)
+                        if current_diff < min_diff:
+                            min_diff = current_diff
+                            closest_value = value
+                    ColourIndex = coloursAve.index(closest_value)
+                    orderedColours.append(colours.pop(ColourIndex))
+                    if len(orderedColours) > 1:
+                        colours = []
                     print(orderedColours[-1])
                 if len(orderedColours) > 2:
                     for i in range(2, len(orderedColours)):
@@ -194,6 +209,7 @@ while True:
                             if orderedColours[i][0] == orderedColours[0][0] or orderedColours[i][0] == orderedColours[1][0]:
                                 if len(targetNumbers) < 2:
                                     targetNumbers.append(i - 2)
+            print('target numbers', targetNumbers)
                                     
             if len(targetNumbers) >= 1:
                 firstTarget = targetNumbers[0]
