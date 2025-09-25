@@ -92,6 +92,7 @@ while True:
         
         success, bgr = cap.read()
         width = int(cap.get(3))  # Get the width of the frame
+        centre = width/2
         height = int(cap.get(4))  # Get the height of the frame
 
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
@@ -162,11 +163,23 @@ while True:
         # cv2.imshow('Red Mask', redMask)
 
         # RED
+        coloursAve = []
         while not(colours == []):
-            coloursX = [sublist[1] for sublist in colours]
-            firstColour = max(coloursX)
-            firstColourIndex = coloursX.index(firstColour)
-            orderedColours.append(colours.pop(firstColourIndex))
+            for i in range(0, len(colours)):
+                ave = colours[1] + colours[3]/2
+                coloursAve.append(ave)
+
+            closest_value = coloursAve[1]
+            min_diff = abs(coloursAve[1] - centre)
+
+            for value in coloursAve:
+                current_diff = abs(value - centre)
+                if current_diff < min_diff:
+                    min_diff = current_diff
+                    closest_value = value
+            ColourIndex = coloursAve.index(closest_value)
+            orderedColours.append(colours[ColourIndex])
+            colours = []
             print(orderedColours[-1])
         if len(orderedColours) > 2:
             for i in range(2, len(orderedColours)):
