@@ -59,7 +59,7 @@ clock = Clock(interval=2)  # take snapshot every 2s
 
 latest_frame = None
 frame_lock = threading.Lock()
-url = "http://192.168.137.51/capture"
+url = "http://192.168.137.249/capture"
 
 def fetch_frames():
     global latest_frame
@@ -82,7 +82,7 @@ threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 70, 65])
+lowerGreen = np.array([40, 80, 150])
 upperGreen = np.array([80, 255, 255])
 lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
@@ -201,8 +201,8 @@ while True:
                         ave = colours[i][1] + colours[i][3]/2
                         coloursAve.append(ave)
 
-                    closest_value = coloursAve[1]
-                    min_diff = abs(coloursAve[1] - centre)
+                    closest_value = coloursAve[0]
+                    min_diff = abs(coloursAve[0] - centre)
 
                     for value in coloursAve:
                         current_diff = abs(value - centre)
