@@ -165,24 +165,32 @@ while True:
                         if cv2.contourArea(blueContour) > 500:
                             x, y, w, h = cv2.boundingRect(blueContour)
                             cv2.rectangle(bgr, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                            colour = [3, x, y, w, h]
+                            colours.append(colour)
                             
                 if len(greenContours) != 0:
                     for greenContour in greenContours:
                         if cv2.contourArea(greenContour) > 500:
                             x, y, w, h = cv2.boundingRect(greenContour)
                             cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            colour = [2, x, y, w, h]
+                            colours.append(colour)
                             
                 if len(yellowContours) != 0:
                     for yellowContour in yellowContours:
                         if cv2.contourArea(yellowContour) > 500:
                             x, y, w, h = cv2.boundingRect(yellowContour)
                             cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 255, 255), 2)
+                            colour = [1, x, y, w, h]
+                            colours.append(colour)
                             
                 if len(redContours) != 0:
                     for redContour in redContours:
                         if cv2.contourArea(redContour) > 500:
                             x, y, w, h = cv2.boundingRect(redContour)
                             cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                            colour = [0, x, y, w, h]
+                            colours.append(colour)
                             
                 cv2.imshow('Original', bgr)
                 
