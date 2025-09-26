@@ -17,7 +17,7 @@ int parkSpacing = 50;
 int dist2start = 200;
 int firstTarget = -1;
 int secondTarget = -1;
-int clock = 0;
+auto clock = std::chrono::system_clock::now() - 3600;
 
 /******** STATE ********/
 // Core state flags and counters
