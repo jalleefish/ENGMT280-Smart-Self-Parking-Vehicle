@@ -150,7 +150,7 @@ void runSystemLogic(){
   else if(secondPark) secondParkLogic();
   else motorStop(); // finished all tasks
   straightCorrection();
-  sender = "distances:" + distances[0] + "," + distances[1] + "," + distances[2] + "," + distances[3] + "," + distances[4];
+  sender = "distances:" + String(distances[0]) + "," + String(distances[1]) + "," + String(distances[2]) + "," + String(distances[3]) + "," + String(distances[4]);
   sendComms();
   if (colourScan == true) {
       sender = "colourScan:0";
