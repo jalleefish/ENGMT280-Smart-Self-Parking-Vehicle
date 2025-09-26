@@ -1,34 +1,50 @@
 import cv2, time, socket, numpy as np, threading, requests
 
+# Define color ranges for blue, red, and yellow in HSV
+lowerBlue = np.array([90, 100, 50])
+upperBlue = np.array([135, 255, 255])
+lowerGreen = np.array([40, 80, 150])
+upperGreen = np.array([80, 255, 255])
+lowerYellow = np.array([20, 70, 100])
+upperYellow = np.array([35, 255, 255])
+lowerRed = np.array([0, 100, 50])
+upperRed = np.array([10, 255, 255])
+lowerRed2 = np.array([160, 100, 50])
+upperRed2 = np.array([180, 255, 255])
+
+boundLenY = 60
+boundLenX = 30
+boundLowY = 200
+
+# sensor stuff
+colourCheck = 1
+colourTarget = [0, 0, 0, 0]
+coloursFound = 0
+orderedColours = []
+colours = []
+colourPos = []
+averagesR = [200]
+averagesY = [200]
+averagesG = [200]
+averagesB = [200]
+blueTarget = False
+redTarget = False
+greenTarget = False
+yellowTarget = False
+target = 0
+targetPos = []
+colourError = 10
+targetColourPos = 20
+run = True
+sender = ''
+receiver = ''
+colourScan = True
+targetNumbers = []
+firstTarget = -1
+secondTarget = -1
+
 HOST = "0.0.0.0"
 PORT = 5000
-
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((HOST, PORT))
-server_socket.listen(1)
-print("Waiting for ESP32...")
-conn, addr = server_socket.accept()
-print(f"Connected by {addr}")
-centre = 160
-time.sleep(0.5)  # wait for connection to stabilize
-conn.sendall(b"motorForward:0\n")
-
-buffer = ""
-
-def comms():
-    global sender, buffer
-    while True:
-        data = conn.recv(1024).decode()
-        if not data:
-            break
-        buffer += data
-        while "\n" in buffer:
-            line, buffer = buffer.split("\n", 1)
-            line = line.strip()
-            if line:
-                sender = line
-
-threading.Thread(target=comms, daemon=True).start()
 
 class Clock:
     def __init__(self, interval: float):
@@ -79,48 +95,56 @@ def fetch_frames():
 
 threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is defined       
 
-# Define color ranges for blue, red, and yellow in HSV
-lowerBlue = np.array([90, 100, 50])
-upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 80, 150])
-upperGreen = np.array([80, 255, 255])
-lowerYellow = np.array([20, 70, 100])
-upperYellow = np.array([35, 255, 255])
-lowerRed = np.array([0, 100, 50])
-upperRed = np.array([10, 255, 255])
-lowerRed2 = np.array([160, 100, 50])
-upperRed2 = np.array([180, 255, 255])
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+print("Waiting for ESP32...")
+conn, addr = server_socket.accept()
+print(f"Connected by {addr}")
+centre = 160
+time.sleep(0.5)  # wait for connection to stabilize
+conn.sendall(b"motorForward:0\n")
 
-boundLenY = 60
-boundLenX = 30
-boundLowY = 200
+buffer = ""
 
-# sensor stuff
-colourCheck = 1
-colourTarget = [0, 0, 0, 0]
-coloursFound = 0
-orderedColours = []
-colours = []
-colourPos = []
-averagesR = [200]
-averagesY = [200]
-averagesG = [200]
-averagesB = [200]
-blueTarget = False
-redTarget = False
-greenTarget = False
-yellowTarget = False
-target = 0
-targetPos = []
-colourError = 10
-targetColourPos = 20
-run = True
-sender = ''
-receiver = ''
-colourScan = True
-targetNumbers = []
-firstTarget = -1
-secondTarget = -1
+def comms():
+    global sender, buffer
+    while True:
+        data = conn.recv(1024).decode()
+        if not data:
+            break
+        buffer += data
+        while "\n" in buffer:
+            line, buffer = buffer.split("\n", 1)
+            line = line.strip()
+            if line:
+                handle_message(line)
+                
+def handle_message(line: str):
+    global colourScan, distances
+    if ":" not in line:
+        print(f"Invalid message: {line}")
+        return
+    
+    cmd, value_str = line.split(":", 1)
+    value_str = value_str.strip()
+    value = None
+    if value_str.isdigit():
+        value = int(value_str)
+    
+    print(f"Received command: {cmd}, value: {value_str}")
+    
+    if cmd == "distances":
+        distances = [int(v) for v in value_str.split(",") if v.strip().isdigit()]
+        print("Distances:", distances)
+    elif cmd == "colourScan":
+        colourScan = True
+    elif cmd == "noScan":
+        colourScan = False
+    else:
+        print(f"Unknown command: {cmd}")
+
+threading.Thread(target=comms, daemon=True).start()
 
 while True:
     if clock.ready():
@@ -137,6 +161,7 @@ while True:
                 bgr = latest_frame  # get the most recent frame
             if bgr is not None:
                 centre = 160
+                bgr = bgr[180 //2 :, :]  # crop to bottom half
                 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
                 # Create ranges for each color

@@ -77,7 +77,7 @@ void firstParkLogic(){
     // Trigger reverse when past target bay
     if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
         reversing = true; steeringBool = true;
-        motorReverse(); steering(98 + MAX_ANGLE);
+        motorReverse(); steering(98 - MAX_ANGLE);
         return;
     }
 
@@ -127,7 +127,7 @@ void secondParkLogic(){
     int targetPos = dist2start + secondTarget * parkSpacing;
     if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
         reversing = true; steeringBool = true;
-        motorReverse(); steering(98 + MAX_ANGLE);
+        motorReverse(); steering(98 - MAX_ANGLE);
     }
     if(parking && reversing){
         if (steeringBool){
@@ -159,18 +159,20 @@ void secondParkLogic(){
 void runSystemLogic(){
 //   checkEmergency();
   if (steeringBool){
-    steering(98 - MAX_ANGLE)
+    steering(98 - MAX_ANGLE);
   }
   if(firstPark) firstParkLogic();
   else if(secondPark) secondParkLogic();
   else motorStop(); // finished all tasks
   straightCorrection();
+  sender = "distances:" + distances[0] + "," + distances[1] + "," + distances[2] + "," + distances[3] + "," + distances[4];
+  sendComms();
   if (colourScan == true) {
-      sender = "colourScan";
+      sender = "colourScan:0";
       sendComms();
   }
   if (colourScan == false) {
-      sender = "noScan";
+      sender = "noScan:0";
       sendComms();
   }
 }
