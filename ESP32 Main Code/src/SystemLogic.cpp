@@ -13,11 +13,10 @@
 const int MAX_ANGLE = 25;            // max steering angle (deg)
 const int PARK_DIST = 30;            // stop distance inside bay (mm)
 const int DIST_FROM_TARGET = 200;  // distance past bay before reversing (mm)
-int parkSpacing = 50;
-int dist2start = 200;
+int parkSpacing = 150;
+int dist2start = 425;
 int firstTarget = -1;
 int secondTarget = -1;
-auto clock = std::chrono::system_clock::now() - 3600;
 
 /******** STATE ********/
 // Core state flags and counters
@@ -31,6 +30,7 @@ bool leavePark = false;
 int  targetCount = 0;     // number of detected target bays
 int  targetPos = 0; // recorded odometer positions of targets
 bool colourScan = true;   // true to perform colour scan
+int timer = 0;
 
 // Outputs
 int motorCmd = 0;         // motor command: -1 reverse, 0 stop, 1 forward
@@ -87,11 +87,11 @@ void firstParkLogic(){
             int dR = distances[3];
             int dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            clock += 1;
-            if (clock) > 150{
+            timer = timer + 1;
+            if (timer > 150){
                 if(abs(distances[4] - distances[3]) < 10){
                     steeringBool = false;
-                    clock = 0;
+                    timer = 0;
                     steering(98); // keep straight
                 }
             }
@@ -103,7 +103,7 @@ void firstParkLogic(){
             motorStop();
             reversing = false; parking = false; steeringBool = false; leavePark = true;
             firstPark = false; secondPark = true; // move to second stage
-            wait(500);
+            delay(500);
             motorForward();
         }
     if (!reversing && !steeringBool){
@@ -130,11 +130,11 @@ void secondParkLogic(){
             long dR = distances[3];
             long dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            clock += 1;
-            if (clock) > 150{
+            timer = timer + 1;
+            if (timer > 150){
                 if(abs(distances[4] - distances[3]) < 10){
                     steeringBool = false;
-                    clock = 0;
+                    timer = 0;
                     steering(98); // keep straight
                 }
             }
