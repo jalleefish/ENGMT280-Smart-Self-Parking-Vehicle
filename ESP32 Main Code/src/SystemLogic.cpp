@@ -87,19 +87,15 @@ void firstParkLogic(){
             int dR = distances[3];
             int dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            
-            if (clock == 0){
-                clock = std::chrono::system_clock::now();
-            } else {
-                int timeNow = std::chrono::system_clock::now();
-                if (timeNow - clock) > 20{
-                    if(abs(distances[4] - distances[3]) < 10){
-                        steeringBool = false;
-                        clock = 0;
-                        steering(98); // keep straight
-                    }
+            clock += 1;
+            if (clock) > 150{
+                if(abs(distances[4] - distances[3]) < 10){
+                    steeringBool = false;
+                    clock = 0;
+                    steering(98); // keep straight
                 }
             }
+            
         }
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
@@ -134,16 +130,12 @@ void secondParkLogic(){
             long dR = distances[3];
             long dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            if (clock == 0){
-                clock = std::chrono::system_clock::now();
-            } else {
-                int timeNow = std::chrono::system_clock::now();
-                if (timeNow - clock) > 20{
-                    if(abs(distances[4] - distances[3]) < 10){
-                        steeringBool = false;
-                        clock = 0;
-                        steering(98); // keep straight
-                    }
+            clock += 1;
+            if (clock) > 150{
+                if(abs(distances[4] - distances[3]) < 10){
+                    steeringBool = false;
+                    clock = 0;
+                    steering(98); // keep straight
                 }
             }
         }
