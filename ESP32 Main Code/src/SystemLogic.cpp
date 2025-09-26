@@ -86,13 +86,12 @@ void firstParkLogic(){
             long dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
             int diff = dR - dL;
-            if(abs(diff)>10){
-                steeringBool = true; // steer toward closer wall
-            } else {
-                Serial.println("ABORT STEERING");
-                steeringBool = false;
-                steering(98); // keep straight
-            }
+            // if(abs(diff)>10){
+            //     steeringBool = true; // steer toward closer wall
+            // } else {
+            //     steeringBool = false;
+            //     steering(98); // keep straight
+            // }
         }
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
@@ -145,18 +144,20 @@ void secondParkLogic(){
 void runSystemLogic(){
 //   checkEmergency();
   if (steeringBool){
-    steering(98 - MAX_ANGLE)
+    steering(98 - MAX_ANGLE);
   }
   if(firstPark) firstParkLogic();
   else if(secondPark) secondParkLogic();
   else motorStop(); // finished all tasks
   straightCorrection();
+  sender = "distances:" + distances[0] + "," + distances[1] + "," + distances[2] + "," + distances[3] + "," + distances[4];
+  sendComms();
   if (colourScan == true) {
-      sender = "colourScan";
+      sender = "colourScan:0";
       sendComms();
   }
   if (colourScan == false) {
-      sender = "noScan";
+      sender = "noScan:0";
       sendComms();
   }
 }
