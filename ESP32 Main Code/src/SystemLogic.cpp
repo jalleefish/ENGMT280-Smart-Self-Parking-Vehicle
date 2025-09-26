@@ -7,6 +7,7 @@
 #include "ServoMotorControl.h"
 #include "Communications.h"
 #include "SystemLogic.h"
+#include <chrono>
 
 // Limits for parking and steering
 const int MAX_ANGLE = 25;            // max steering angle (deg)
@@ -16,6 +17,7 @@ int parkSpacing = 50;
 int dist2start = 200;
 int firstTarget = -1;
 int secondTarget = -1;
+int clock = 0;
 
 /******** STATE ********/
 // Core state flags and counters
@@ -82,15 +84,21 @@ void firstParkLogic(){
     // While reversing, stop once inside bay
     if(parking && reversing){
         if (steeringBool){
-            long dR = distances[3];
-            long dL = distances[4];
+            int dR = distances[3];
+            int dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            int diff = dR - dL;
-            if(abs(diff)>10){
-                steeringBool = true; // steer toward closer wall
+            
+            if (clock == 0){
+                clock = std::chrono::system_clock::now();
             } else {
-                steeringBool = false;
-                steering(98); // keep straight
+                int timeNow = std::chrono::system_clock::now();
+                if (timeNow - clock) > 20{
+                    if(abs(distances[4] - distances[3]) < 10){
+                        steeringBool = false;
+                        clock = 0;
+                        steering(98); // keep straight
+                    }
+                }
             }
         }
         colourScan = false;
@@ -99,11 +107,13 @@ void firstParkLogic(){
             motorStop();
             reversing = false; parking = false; steeringBool = false; leavePark = true;
             firstPark = false; secondPark = true; // move to second stage
+            wait(500);
+            motorForward();
         }
     if (!reversing && !steeringBool){
         colourScan = true;
     }
-  }
+    }
 }
 
 // Second parking manoeuvre (if required)
@@ -124,12 +134,17 @@ void secondParkLogic(){
             long dR = distances[3];
             long dL = distances[4];
             if(dR<0 || dL<0) return; // ignore if invalid reading
-            int diff = dR - dL;
-            if(abs(diff)>15){
-                steeringBool = true; // steer toward closer wall
+            if (clock == 0){
+                clock = std::chrono::system_clock::now();
             } else {
-                steeringBool = false;
-                steering(98); // keep straight
+                int timeNow = std::chrono::system_clock::now();
+                if (timeNow - clock) > 20{
+                    if(abs(distances[4] - distances[3]) < 10){
+                        steeringBool = false;
+                        clock = 0;
+                        steering(98); // keep straight
+                    }
+                }
             }
         }
         long rearAvg = (distances[3]+distances[4])/2;
