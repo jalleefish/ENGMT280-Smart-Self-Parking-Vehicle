@@ -1,5 +1,4 @@
 import cv2, time, socket, numpy as np, threading
-from PIL import Image
 
 HOST = "0.0.0.0"
 PORT = 5000
