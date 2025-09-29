@@ -1,88 +1,9 @@
 import cv2, time, socket, numpy as np, threading, requests
 
-HOST = "0.0.0.0"
-PORT = 5000
-
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((HOST, PORT))
-server_socket.listen(1)
-print("Waiting for ESP32...")
-conn, addr = server_socket.accept()
-print(f"Connected by {addr}")
-centre = 160
-time.sleep(0.5)  # wait for connection to stabilize
-conn.sendall(b"motorForward:0\n")
-
-buffer = ""
-
-def comms():
-    global sender, buffer
-    while True:
-        data = conn.recv(1024).decode()
-        if not data:
-            break
-        buffer += data
-        while "\n" in buffer:
-            line, buffer = buffer.split("\n", 1)
-            line = line.strip()
-            if line:
-                sender = line
-
-threading.Thread(target=comms, daemon=True).start()
-
-class Clock:
-    def __init__(self, interval: float):
-        self.interval: float = interval
-        self.last_time = time.time()
-        self.running = True
-
-    def start(self):
-        self.running = True
-        self.last_time = time.time()
-
-    def stop(self):
-        self.running = False
-
-    def reset(self):
-        self.last_time = time.time()
-
-    def ready(self):
-        if not self.running:
-            return False
-        now = time.time()
-        if now - self.last_time >= self.interval:
-            self.last_time = now
-            return True
-        return False
-    
-clock = Clock(interval=2)  # take snapshot every 2s
-
-latest_frame = None
-frame_lock = threading.Lock()
-url = "http://192.168.137.51/capture"
-
-def fetch_frames():
-    global latest_frame
-    while True:
-        try:
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                img_array = np.frombuffer(response.content, np.uint8)
-                bgr = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-                if bgr is not None:
-                    with frame_lock:
-                        latest_frame = bgr
-            else:
-                print("HTTP error:", response.status_code)
-        except Exception as e:
-            print("Error fetching image:", e)
-
-threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is defined       
-
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 70, 65])
+lowerGreen = np.array([40, 70, 50])
 upperGreen = np.array([80, 255, 255])
 lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
@@ -122,6 +43,104 @@ targetNumbers = []
 firstTarget = -1
 secondTarget = -1
 
+HOST = "0.0.0.0"
+PORT = 5000
+
+class Clock:
+    def __init__(self, interval: float):
+        self.interval: float = interval
+        self.last_time = time.time()
+        self.running = True
+
+    def start(self):
+        self.running = True
+        self.last_time = time.time()
+
+    def stop(self):
+        self.running = False
+
+    def reset(self):
+        self.last_time = time.time()
+
+    def ready(self):
+        if not self.running:
+            return False
+        now = time.time()
+        if now - self.last_time >= self.interval:
+            self.last_time = now
+            return True
+        return False
+    
+clock = Clock(interval=3)  # take snapshot every 2s
+
+latest_frame = None
+frame_lock = threading.Lock()
+url = "http://192.168.137.249/capture"
+
+def fetch_frames():
+    global latest_frame
+    while True:
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                img_array = np.frombuffer(response.content, np.uint8)
+                bgr = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+                if bgr is not None:
+                    with frame_lock:
+                        latest_frame = bgr
+            else:
+                print("HTTP error:", response.status_code)
+        except Exception as e:
+            print("Error fetching image:", e)
+
+threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is defined       
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+print("Waiting for ESP32...")
+conn, addr = server_socket.accept()
+print(f"Connected by {addr}")
+
+buffer = ""
+
+def comms():
+    global sender, buffer
+    while True:
+        data = conn.recv(1024).decode()
+        if not data:
+            break
+        buffer += data
+        while "\n" in buffer:
+            line, buffer = buffer.split("\n", 1)
+            line = line.strip()
+            if line:
+                handle_message(line)
+                
+def handle_message(line: str):
+    global colourScan, distances, sender
+    if ":" not in line:
+        print(f"Invalid message: {line}")
+        return
+    
+    cmd, value_str = line.split(":", 1)
+    value_str = value_str.strip()
+    value = None
+    if value_str.isdigit():
+        value = int(value_str)
+    
+    if cmd == "distances":
+        distances = [int(v) for v in value_str.split(",") if v.strip().isdigit()]
+        # print("Distances:", distances)
+    elif cmd == "colourScan":
+        sender = "colourScan"
+    elif cmd == "noScan":
+        sender = "noScan"
+    else:
+        print(f"Unknown command: {cmd}")
+
+threading.Thread(target=comms, daemon=True).start()
+
 while True:
     if clock.ready():
         if sender == 'colourScan':
@@ -136,7 +155,9 @@ while True:
             with frame_lock:
                 bgr = latest_frame  # get the most recent frame
             if bgr is not None:
+                conn.sendall(b"motorForward:0\n")
                 centre = 160
+                bgr = bgr[180 //2 :, :]  # crop to bottom half
                 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
                 # Create ranges for each color
@@ -146,12 +167,6 @@ while True:
                 red1 = cv2.inRange(hsv, lowerRed, upperRed)
                 red2 = cv2.inRange(hsv, lowerRed2, upperRed2)
                 red = red1 + red2  # Combine the two red masks
-
-                # # Create masks for each color
-                # blueMask = cv2.bitwise_and(bgr, bgr, mask=blue)
-                # greenMask = cv2.bitwise_and(bgr, bgr, mask=green)
-                # yellowMask = cv2.bitwise_and(bgr, bgr, mask=yellow)
-                # redMask = cv2.bitwise_and(bgr, bgr, mask=red)
                 
                 # Find contours for each color mask
                 blueContours, blueHierarchy=cv2.findContours(blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -198,11 +213,11 @@ while True:
                 while not(colours == []):
                     print('found colour')
                     for i in range(0, len(colours)):
-                        ave = colours[1] + colours[3]/2
+                        ave = colours[i][1] + colours[i][3]/2
                         coloursAve.append(ave)
 
-                    closest_value = coloursAve[1]
-                    min_diff = abs(coloursAve[1] - centre)
+                    closest_value = coloursAve[0]
+                    min_diff = abs(coloursAve[0] - centre)
 
                     for value in coloursAve:
                         current_diff = abs(value - centre)
@@ -210,7 +225,8 @@ while True:
                             min_diff = current_diff
                             closest_value = value
                     ColourIndex = coloursAve.index(closest_value)
-                    orderedColours.append(colours.pop(ColourIndex))
+                    orderedColours.append(colours[ColourIndex])
+                    del colours[ColourIndex]
                     if len(orderedColours) > 1:
                         colours = []
                     print(orderedColours[-1])

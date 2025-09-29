@@ -7,13 +7,14 @@
 #include "ServoMotorControl.h"
 #include "Communications.h"
 #include "SystemLogic.h"
+#include <chrono>
 
 // Limits for parking and steering
 const int MAX_ANGLE = 25;            // max steering angle (deg)
 const int PARK_DIST = 30;            // stop distance inside bay (mm)
 const int DIST_FROM_TARGET = 200;  // distance past bay before reversing (mm)
-int parkSpacing = 50;
-int dist2start = 200;
+int parkSpacing = 150;
+int dist2start = 425;
 int firstTarget = -1;
 int secondTarget = -1;
 
@@ -24,9 +25,12 @@ bool firstPark = true;    // true until first parking complete
 bool secondPark= false;   // true if second park required
 bool reversing = false;   // true while reversing
 bool parking   = false;   // true during a parking manoeuvre
+bool steeringBool = false;
+bool leavePark = false;
 int  targetCount = 0;     // number of detected target bays
 int  targetPos = 0; // recorded odometer positions of targets
 bool colourScan = true;   // true to perform colour scan
+int timer = 0;
 
 // Outputs
 int motorCmd = 0;         // motor command: -1 reverse, 0 stop, 1 forward
@@ -35,11 +39,15 @@ int turnAngle = 0;        // steering angle (deg)
 /******** LOGIC ********/
 // Adjust steering to keep straight using left/right wall sensors
 void straightCorrection(){
+  if (steeringBool) return;
+  if (parking) return;
+  
   long dS = distances[2];
   long dR = distances[3];
   long dL = distances[4];
-
-  if (dS < 0) return;              // ignore if no side wall
+  if (((dL + dR) / 2) < 50) return;
+  leavePark = false;
+  if (dS <0) return;              // ignore if no side wall
   if (dS > (122+5)) turnAngle += 1;     // steer toward wall if too far
   else if (dS < (122-5)) turnAngle -= 1; // steer away if too close
   else turnAngle = 0;              // keep straight if just right
@@ -63,44 +71,78 @@ void straightCorrection(){
 // First parking manoeuvre
 void firstParkLogic(){
     if(firstTarget == -1) return; // no bay recorded yet
+    parking = true;
     int targetPos = dist2start + firstTarget * parkSpacing;
 
     // Trigger reverse when past target bay
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
-        reversing = true; parking=true;
-        motorReverse(); steering(98+MAX_ANGLE);
+    if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
+        reversing = true; steeringBool = true;
+        motorReverse(); steering(98 - MAX_ANGLE);
+        return;
     }
 
     // While reversing, stop once inside bay
     if(parking && reversing){
+        if (steeringBool){
+            int dR = distances[3];
+            int dL = distances[4];
+            if(dR<0 || dL<0) return; // ignore if invalid reading
+            timer = timer + 1;
+            if (timer > 150){
+                if(abs(distances[4] - distances[3]) < 10){
+                    steeringBool = false;
+                    timer = 0;
+                    steering(98); // keep straight
+                }
+            }
+            
+        }
         colourScan = false;
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
-        motorStop();
-        reversing=false; parking=false;
-        firstPark=false; secondPark=true; // move to second stage
+            motorStop();
+            reversing = false; parking = false; steeringBool = false; leavePark = true;
+            firstPark = false; secondPark = true; // move to second stage
+            delay(500);
+            motorForward();
         }
-    if (!reversing && !steering){
+    if (!reversing && !steeringBool){
         colourScan = true;
     }
-  }
+    }
 }
 
 // Second parking manoeuvre (if required)
 void secondParkLogic(){
-    colourScan = true;
+    if (!reversing && !steeringBool){
+        colourScan = true;
+        }
     if(secondTarget == -1) return; // no bay recorded yet
-    parking=true;
+    colourScan = false;
+    parking = true;
     int targetPos = dist2start + secondTarget * parkSpacing;
-    if(!reversing && ((distances[3]+distances[4])/2 - targetPos) > DIST_FROM_TARGET){
-        reversing=true; 
-        motorReverse(); steering(98+MAX_ANGLE);
+    if(!reversing && abs((distances[3]+distances[4])/2 - targetPos - DIST_FROM_TARGET) < 15){
+        reversing = true; steeringBool = true;
+        motorReverse(); steering(98 - MAX_ANGLE);
     }
     if(parking && reversing){
+        if (steeringBool){
+            long dR = distances[3];
+            long dL = distances[4];
+            if(dR<0 || dL<0) return; // ignore if invalid reading
+            timer = timer + 1;
+            if (timer > 150){
+                if(abs(distances[4] - distances[3]) < 10){
+                    steeringBool = false;
+                    timer = 0;
+                    steering(98); // keep straight
+                }
+            }
+        }
         long rearAvg = (distances[3]+distances[4])/2;
         if(rearAvg != -1 && rearAvg <= PARK_DIST){
-        motorStop();
-        runLoop=false; // finished after second park
+            motorStop();
+            runLoop=false; // finished after second park
         }
     }
 }
@@ -108,16 +150,21 @@ void secondParkLogic(){
 // Arduino loop function: main control flow
 void runSystemLogic(){
 //   checkEmergency();
+  if (steeringBool){
+    steering(98 - MAX_ANGLE);
+  }
   if(firstPark) firstParkLogic();
   else if(secondPark) secondParkLogic();
   else motorStop(); // finished all tasks
   straightCorrection();
+  sender = "distances:" + String(distances[0]) + "," + String(distances[1]) + "," + String(distances[2]) + "," + String(distances[3]) + "," + String(distances[4]);
+  sendComms();
   if (colourScan == true) {
-      sender = "colourScan";
+      sender = "colourScan:0";
       sendComms();
   }
   if (colourScan == false) {
-      sender = "noScan";
+      sender = "noScan:0";
       sendComms();
   }
 }
