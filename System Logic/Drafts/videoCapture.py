@@ -1,4 +1,31 @@
-import cv2, time, socket, numpy as np, threading, requests
+import cv2, time, socket, numpy as np, threading
+
+HOST = "0.0.0.0"
+PORT = 5000
+buffer = ""
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+print("Waiting for ESP32...")
+conn, addr = server_socket.accept()
+print(f"Connected by {addr}")
+
+def comms():
+    global sender, buffer
+    while True:
+        data = conn.recv(1024).decode()
+        if not data:
+            break
+        buffer += data
+        while "\n" in buffer:
+            line, buffer = buffer.split("\n", 1)
+            line = line.strip()
+            if line:
+                sender = line
+                print("Sender:", sender)
+
+threading.Thread(target=comms, daemon=True).start()
 
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
@@ -12,94 +39,9 @@ upperRed = np.array([10, 255, 255])
 lowerRed2 = np.array([160, 100, 50])
 upperRed2 = np.array([180, 255, 255])
 
-boundLenY = 60
-boundLenX = 30
-boundLowY = 200
-
-# sensor stuff
-colourCheck = 1
-colourTarget = [0, 0, 0, 0]
-coloursFound = 0
-orderedColours = []
-colours = []
-colourPos = []
-averagesR = [200]
-averagesY = [200]
-averagesG = [200]
-averagesB = [200]
-blueTarget = False
-redTarget = False
-greenTarget = False
-yellowTarget = False
-target = 0
-targetPos = []
-colourError = 10
-targetColourPos = 20
-run = True
-sender = ''
-receiver = ''
-colourScan = True
-targetNumbers = []
-firstTarget = -1
-secondTarget = -1
-
-HOST = "0.0.0.0"
-PORT = 5000
-
-class Clock:
-    def __init__(self, interval: float):
-        self.interval: float = interval
-        self.last_time = time.time()
-        self.running = True
-
-    def start(self):
-        self.running = True
-        self.last_time = time.time()
-
-    def stop(self):
-        self.running = False
-
-    def reset(self):
-        self.last_time = time.time()
-
-    def ready(self):
-        if not self.running:
-            return False
-        now = time.time()
-        if now - self.last_time >= self.interval:
-            self.last_time = now
-            return True
-        return False
-    
-clock = Clock(interval=3)  # take snapshot every 2s
-
 #url = 0
 url = "http://192.168.137.136:81/stream"
 cap = cv2.VideoCapture(url)  # Open the ESP32-CAM stream
-
-def video_stream():
-    global latest_frame
-    while run:
-        try:
-            success, bgr = cap.read()
-            width = int(cap.get(3))  # Get the width of the frame
-            height = int(cap.get(4))  # Get the height of the frame
-
-            hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-
-        except requests.RequestException as e:
-            print(f"Error fetching image: {e}")
-        time.sleep(0.1)  # slight delay to avoid overwhelming the camera
-        
-threading.Thread(target=fetch_frames, daemon=True).start()  # start after url is defined       
-
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((HOST, PORT))
-server_socket.listen(1)
-print("Waiting for ESP32...")
-conn, addr = server_socket.accept()
-print(f"Connected by {addr}")
-buffer = ""
 
 while True:
     success, bgr = cap.read()
