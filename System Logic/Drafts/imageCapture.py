@@ -3,7 +3,7 @@ import cv2, time, socket, numpy as np, threading, requests
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 100, 50])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 80, 150])
+lowerGreen = np.array([40, 70, 50])
 upperGreen = np.array([80, 255, 255])
 lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
@@ -71,7 +71,7 @@ class Clock:
             return True
         return False
     
-clock = Clock(interval=2)  # take snapshot every 2s
+clock = Clock(interval=3)  # take snapshot every 2s
 
 latest_frame = None
 frame_lock = threading.Lock()
@@ -101,9 +101,6 @@ server_socket.listen(1)
 print("Waiting for ESP32...")
 conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
-centre = 160
-time.sleep(0.5)  # wait for connection to stabilize
-conn.sendall(b"motorForward:0\n")
 
 buffer = ""
 
@@ -121,7 +118,7 @@ def comms():
                 handle_message(line)
                 
 def handle_message(line: str):
-    global colourScan, distances
+    global colourScan, distances, sender
     if ":" not in line:
         print(f"Invalid message: {line}")
         return
@@ -132,15 +129,13 @@ def handle_message(line: str):
     if value_str.isdigit():
         value = int(value_str)
     
-    print(f"Received command: {cmd}, value: {value_str}")
-    
     if cmd == "distances":
         distances = [int(v) for v in value_str.split(",") if v.strip().isdigit()]
-        print("Distances:", distances)
+        # print("Distances:", distances)
     elif cmd == "colourScan":
-        colourScan = True
+        sender = "colourScan"
     elif cmd == "noScan":
-        colourScan = False
+        sender = "noScan"
     else:
         print(f"Unknown command: {cmd}")
 
@@ -160,6 +155,7 @@ while True:
             with frame_lock:
                 bgr = latest_frame  # get the most recent frame
             if bgr is not None:
+                conn.sendall(b"motorForward:0\n")
                 centre = 160
                 bgr = bgr[180 //2 :, :]  # crop to bottom half
                 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
@@ -171,12 +167,6 @@ while True:
                 red1 = cv2.inRange(hsv, lowerRed, upperRed)
                 red2 = cv2.inRange(hsv, lowerRed2, upperRed2)
                 red = red1 + red2  # Combine the two red masks
-
-                # # Create masks for each color
-                # blueMask = cv2.bitwise_and(bgr, bgr, mask=blue)
-                # greenMask = cv2.bitwise_and(bgr, bgr, mask=green)
-                # yellowMask = cv2.bitwise_and(bgr, bgr, mask=yellow)
-                # redMask = cv2.bitwise_and(bgr, bgr, mask=red)
                 
                 # Find contours for each color mask
                 blueContours, blueHierarchy=cv2.findContours(blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -235,7 +225,8 @@ while True:
                             min_diff = current_diff
                             closest_value = value
                     ColourIndex = coloursAve.index(closest_value)
-                    orderedColours.append(colours.pop(ColourIndex))
+                    orderedColours.append(colours[ColourIndex])
+                    del colours[ColourIndex]
                     if len(orderedColours) > 1:
                         colours = []
                     print(orderedColours[-1])
