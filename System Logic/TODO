@@ -1,5 +1,4 @@
 Adjust parking (make him park)
 Adjust distance senosr and colour threshods as needed**
 Find minimum turning radius (The minimum turning radius for the SSV is – 245.346096 mm)
-rewrite image processing to use video stream
 make the colour detection reliable
