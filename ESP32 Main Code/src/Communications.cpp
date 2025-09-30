@@ -58,6 +58,12 @@ void receiveComms() {
                 Serial.println("Found Second Target: " + String(secondTarget));
             } else if (cmd == "motorForward") {
                 motorForward();
+            } else if (cmd == "motorReverse") {
+                motorReverse();
+            } else if (cmd == "motorStop") {
+                motorStop();
+            } else if (cmd == "steering") {
+                steering(value);
             } else {
                 Serial.println("Unknown command: " + cmd);
             }

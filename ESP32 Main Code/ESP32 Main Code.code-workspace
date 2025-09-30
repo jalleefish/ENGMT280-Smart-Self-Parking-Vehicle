@@ -7,5 +7,10 @@
 			"path": "../System Logic"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.tokenColorCustomizations": {
+			"comments": "",
+			"textMateRules": []
+		}
+	}
 }

@@ -1,0 +1,42 @@
+//Motor.cpp
+// This file contains the implementation of motor functionalities for the Self Parking Car project.
+#include <Arduino.h>
+#include "Settings.h"
+#include "DistanceSensors.h"
+#include "MotorControl.h"
+#include "ServoMotorControl.h"
+#include "Communications.h"
+#include "SystemLogic.h"
+
+const int MotorChannel = 1;    // PWM channel (0–15)
+const int PWMResolution = 8;   // 8-bit (0–255)
+const int PWMFrequency = 5000;
+
+void setupMotor() {
+    pinMode(MotorDirection, OUTPUT);
+    pinMode(MotorSpeed, OUTPUT);
+
+    // Setup PWM on ESP32
+    ledcSetup(MotorChannel, PWMFrequency, PWMResolution);
+    ledcAttachPin(MotorSpeed, MotorChannel);
+
+    digitalWrite(MotorDirection, HIGH); // initial forward direction
+    ledcWrite(MotorChannel, 0);         // motor stopped initially
+}
+
+void motorForward() {
+    digitalWrite(MotorDirection, HIGH);
+    ledcWrite(MotorChannel, 255);   // speed: 0–255
+    Serial.println("Motor moving forward");
+}
+
+void motorReverse() {
+    digitalWrite(MotorDirection, LOW);
+    ledcWrite(MotorChannel, 255);   // speed: 0–255
+    Serial.println("Motor reversing");
+}
+
+void motorStop() {
+    ledcWrite(MotorChannel, 0);       // stop motor
+    Serial.println("Motor stopped");
+}
