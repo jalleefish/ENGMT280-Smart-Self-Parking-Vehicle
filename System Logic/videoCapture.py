@@ -3,13 +3,13 @@ import cv2, time, socket, numpy as np, threading, requests
 # Define color ranges for blue, red, and yellow in HSV
 lowerBlue = np.array([90, 110, 130])
 upperBlue = np.array([135, 255, 255])
-lowerGreen = np.array([40, 70, 80])
+lowerGreen = np.array([40, 70, 50])
 upperGreen = np.array([80, 255, 255])
-lowerYellow = np.array([20, 30, 100])
+lowerYellow = np.array([20, 70, 100])
 upperYellow = np.array([35, 255, 255])
-lowerRed = np.array([0, 100, 80])
+lowerRed = np.array([0, 100, 50])
 upperRed = np.array([10, 255, 255])
-lowerRed2 = np.array([160, 100, 80])
+lowerRed2 = np.array([160, 140, 50])
 upperRed2 = np.array([180, 255, 255])
 
 boundLenY = 60
@@ -73,7 +73,48 @@ clock = Clock(interval=3)  # take snapshot every 2s
 
 HOST = "0.0.0.0"
 PORT = 5000
-url = "http://192.168.137.145:81/stream"  # ESP32-CAM MJPEG stream URL
+cam_ip = "esp32cam.local"
+stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
+settings_url = f"http://{cam_ip}/control"
+
+# ESP32-CAM OV2640 default settings dictionary
+esp32cam_defaults = {
+    # Automatic controls
+    "awb": 1,             # Automatic White Balance ON
+    "awb_gain": 1,        # AWB Gain disabled
+    "aec": 0,             # Automatic Exposure Control ON
+    "aec2": 0,            # Second AE mode ON
+    "agc": 1,             # Automatic Gain Control ON
+    "gain_ctrl": 1,       # Auto Gain ON
+    "ae_level": 200,        # Only used when aec=0
+
+    # Color / image
+    "saturation": 2,      # -2 to 2
+    "brightness": 0,      # -2 to 2
+    "contrast": 2,        # -2 to 2
+    "special_effect": 0,  # 0 = None
+    "wb_mode": 0,         # 0 = Auto / default
+
+    # # Manual RGB gains (only used if awb=0)
+    # "r_gain": 128,        # Red gain
+    # "g_gain": 128,        # Green gain
+    # "b_gain": 128,        # Blue gain
+
+    # Orientation
+    # "vflip": 0,           # Vertical flip OFF
+    # "hmirror": 0,         # Horizontal mirror OFF
+    # "dcw": 1,             # Downsize image (camera scaling)
+
+    # Resolution / frame
+    "framesize": 10,      # FRAMESIZE_UXGA (1600x1200)
+    "quality": 10,        # JPEG quality (0 best, 63 worst)
+    "fb_count": 1,        # Number of frame buffers
+    # "grab_mode": 0,       # CAMERA_GRAB_WHEN_EMPTY
+}
+
+for var, val in esp32cam_defaults.items():
+    requests.get(f"{settings_url}?var={var}&val={val}")
+
 
 latest_frame = None
 frame_lock = threading.Lock()
@@ -81,7 +122,7 @@ streaming = True
 
 def fetch_video():
     global latest_frame
-    cap = cv2.VideoCapture(url)
+    cap = cv2.VideoCapture(stream_url)
     if not cap.isOpened():
         print("Failed to open video stream")
         return
@@ -104,6 +145,12 @@ server_socket.listen(1)
 print("Waiting for ESP32...")
 conn, addr = server_socket.accept()
 print(f"Connected by {addr}")
+
+try:
+    conn.sendall(b"motorForward:0\n")
+    print("Sent initial go command to ESP32")
+except (ConnectionResetError, BrokenPipeError):
+    print("Failed to send command: ESP32 disconnected")
 
 buffer = ""
 
@@ -150,9 +197,8 @@ while True:
     
     if bgr is not None:
         h, w, _ = bgr.shape
-        bgr = bgr[95:h, 4*w//10:6*w//10]  # crop to central region
+        bgr = bgr[195:h, 4*w//10:6*w//10]  # crop to central region
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-        conn.sendall(b"motorForward:0\n")
 
         # Create ranges for each color
         blue = cv2.inRange(hsv, lowerBlue, upperBlue)
