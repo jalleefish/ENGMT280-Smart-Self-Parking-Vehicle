@@ -5,6 +5,8 @@
 
 //Outputs
 extern String sender;
+extern int firstTarget;
+extern int secondTarget;
 
 //Functions
 void setupComms();          // Setup communications

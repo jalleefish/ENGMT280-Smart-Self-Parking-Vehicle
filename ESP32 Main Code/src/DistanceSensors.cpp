@@ -29,11 +29,11 @@ long readDistance(uint8_t pin) {
 }
 
 void updateDist() {
-    distances[0] = readDistance(DistPin1) + 20;
-    distances[1] = readDistance(DistPin2) + 35;
-    distances[2] = readDistance(DistPin3) + 25;
-    distances[3] = readDistance(DistPin4) + 15;
-    distances[4] = readDistance(DistPin5) + 30;
+    distances[0] = readDistance(DistPin1) + 12;
+    distances[1] = readDistance(DistPin2) + 0;
+    distances[2] = readDistance(DistPin3) + 20;
+    distances[3] = readDistance(DistPin4) + 4;
+    distances[4] = readDistance(DistPin5) + 8;
 
     // Debugging output
     Serial.print("Distances: ");

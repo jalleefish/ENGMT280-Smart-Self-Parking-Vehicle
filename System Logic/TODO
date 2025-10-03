@@ -2,3 +2,19 @@ Find minimum turning radius (The minimum turning radius for the SSV is – 245.3
 Park logic 
 White ballance tuning
 Motor PWM
+
+
+REAR SENSOR CALIBRATION
+Actual  Left    Right
+50      55      58
+100     103     114
+200     207     210
+300     303     310
+400     407     398
+500     499     490
+        REAR    FRONT
+Park 1    
+Park 2
+
+50s 1000mm
+20mm/s

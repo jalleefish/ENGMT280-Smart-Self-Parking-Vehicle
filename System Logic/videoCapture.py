@@ -7,50 +7,38 @@ colourScan = True
 streaming = True
 calibrating = True
 wb_locked = False
+recievedFistTarget = False
+recievedSecondTarget = False
 parkRange = {
-             "1" : (345, 380), 
-             "2" : (390, 600), 
-             "3" :(610, 720), 
-             "4" : (730, 840), 
-             "5" : (850, 960), 
-             "6" : (1000, 1110), 
-             "7" : (1120, 1230)
+             "1" : (245, 320), 
+             "2" : (360, 430), 
+             "3" : (475, 550), 
+             "4" : (595, 660), 
+             "5" : (720, 780), 
+             "6" : (820, 870), 
+             "7" : (840, 930)
              }
-distances = [0, 0, 0, 0, 0]  # right, front, left, back right, back left #345
-rightSensor = 0
-currentPos = 0
-def printDistances():
-    global rightSensor, currentPos
-    while True:
-        rightSensor = distances[0]
-        frontSensor = distances[1]
-        backAverage = (distances[3] + distances[4]) / 2
-        if backAverage < frontSensor:
-            currentPos = backAverage + 105
-        else:
-            currentPos = frontSensor - 55
-        print(distances)
-        time.sleep(1)
 print("Logic Configured")
 
 # ---- Colour Detection Setup ---- 
 # Define color ranges for blue, red, and yellow in HSV
-lowerBlue = np.array([90, 110, 130])
+lowerBlue = np.array([90, 100, 70])
 upperBlue = np.array([135, 255, 255])
 lowerGreen = np.array([40, 70, 50])
 upperGreen = np.array([80, 255, 255])
-lowerYellow = np.array([20, 70, 100])
+lowerYellow = np.array([20, 110, 100])
 upperYellow = np.array([35, 255, 255])
 lowerRed = np.array([0, 100, 50])
 upperRed = np.array([10, 255, 255])
 lowerRed2 = np.array([160, 140, 50])
 upperRed2 = np.array([180, 255, 255])
 
-minArea = 4000
-colourTarget = [0, 0]
+minArea = 6000
+colourTarget = [-1, -1]
 colours = [-1, 0, 0, 0, 0]
 targetPos = []
 targetNumbers = []
+targetColours = []
 firstTarget = -1
 secondTarget = -1
 bgr: np.ndarray | None = None
@@ -97,7 +85,7 @@ conn, addr = server_socket.accept()
 print(f"ESP32 Connected as {addr}")
 
 def handle_message(line: str):
-    global colourScan, distances, sender
+    global colourScan, distances, sender, recievedFistTarget, recievedSecondTarget
     if ":" not in line:
         print(f"Invalid message: {line}")
         return
@@ -109,18 +97,27 @@ def handle_message(line: str):
         value = int(value_str)
     
     if cmd == "distances":
-        distances = [int(v) for v in value_str.split(",") if v.strip().isdigit()]
-        # print("Distances:", distances)
+        raw_values = [int(v) for v in value_str.split(",") if v.strip().isdigit()]
+        # pad or trim to ensure exactly 5 values
+        while len(raw_values) < 5:
+            raw_values.append(0)
+        distances = raw_values[:5]
     elif cmd == "colourScan":
         colourScan = True
     elif cmd == "noScan":
         colourScan = False
+    elif cmd == "recievedFistTarget":
+        recievedFistTarget = True
+        print("Confirm recievedFistTarget")
+    elif cmd == "recievedSecondTarget":
+        recievedSecondTarget = True
+        print("Confirm recievedSecondTarget")
     else:
         print(f"Unknown command: {cmd}")
 
 def comms():
     global sender, buffer
-    while True:
+    while streaming:
         data = conn.recv(1024).decode()
         if not data:
             break
@@ -132,9 +129,18 @@ def comms():
                 handle_message(line)
 threading.Thread(target=comms, daemon=True).start()
 
+# ---- Distance Reading ----
+distances = [0, 0, 0, 0, 0]  # right, front, left, back right, back left #345
+rightSensor = 0
+currentPos = 0
+def printDistances():
+    while streaming:
+        print(distances)
+        time.sleep(1)
+
 # ---- ESP32 Camera Communications Setup ----
 # cam_ip = "esp32cam.local"
-cam_ip = "192.168.137.131"
+cam_ip = "192.168.137.138"
 stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
 settings_url = f"http://{cam_ip}/control"
 latest_frame = None
@@ -152,9 +158,9 @@ esp32cam_defaults = {
     "ae_level": 200,        # Only used when aec=0
 
     # Color / image
+    "contrast": 1,        # -2 to 2
     "saturation": 2,      # -2 to 2
-    "brightness": 0,      # -2 to 2
-    "contrast": 2,        # -2 to 2
+    "brightness": 1,      # -2 to 2
     "special_effect": 0,  # 0 = None
     "wb_mode": 0,         # 0 = Auto / default
 
@@ -179,7 +185,7 @@ for var, val in esp32cam_defaults.items():
 print("Camera Defaults Set")
 
 def fetch_video():
-    global latest_frame
+    global latest_frame, cap
     cap = cv2.VideoCapture(stream_url)
     if not cap.isOpened():
         print("Failed to open video stream")
@@ -191,19 +197,25 @@ def fetch_video():
             continue
         with frame_lock:
             latest_frame = frame.copy()
-    cap.release()
 threading.Thread(target=fetch_video, daemon=True).start()
 
-print("\nCalibration Active")
+print("Calibration Active")
 print("Press 'ENTER' to lock WB, 'G' to start the car and 'Q' to quit at any time")
 
 while streaming:
     with frame_lock:
         bgr = latest_frame.copy() if latest_frame is not None else None
     key = cv2.waitKey(1) & 0xFF
+    rightSensor = distances[0]
+    frontSensor = distances[1]
+    backAverage = (distances[3] + distances[4]) / 2
+    if backAverage < frontSensor:
+        currentPos = backAverage + 105
+    else:
+        currentPos = 1688 - 55 -frontSensor
     if bgr is not None:
         h, w, _ = bgr.shape
-        bgr = bgr[195:h, 4*w//10:6*w//10]  # crop to central region
+        bgr = bgr[195:h, 2*w//10:5*w//10]  # crop to central region
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
         
         # Create ranges for each color
@@ -257,6 +269,8 @@ while streaming:
 
     # === Stage 1: Calibration ===
     if calibrating:
+        print(currentPos, colours, distances, findTarget, colourScan, colourTarget)
+        # print(currentPos, distances)
         if key == 13:  # ENTER
             calibrating = False
             wb_locked = True
@@ -272,12 +286,14 @@ while streaming:
     # === Stage 2: WB locked, waiting for Go ===
     elif wb_locked and not start:
         if key == ord('g'):
-            threading.Thread(target=printDistances).start()
+            threading.Thread(target=printDistances, daemon=True).start()
             start = True
+            colours = [-1, 0, 0, 0, 0]
             print("Starting the car...")
             try:
                 if conn:
                     conn.sendall(b"motorForward:0\n")
+                    conn.sendall(b"steering:98")
                     print("Sent initial go command to ESP32")
                 else:
                     print("No ESP32 connection available")
@@ -290,47 +306,61 @@ while streaming:
     # === Stage 3: Start the car
     elif start:       
         detectedColour = colours[0]
-        
-        if rightSensor < 100 and findTarget:
+        # print(currentPos, colours, distances, findTarget, colourScan, colourTarget, detectedColour)
+        if distances[0] < 130 and findTarget:
             if colours != [-1, 0, 0, 0, 0] and colourScan:
-                if colourTarget == [0, 0]:
+                if colourTarget == [-1, -1]:
                     colourTarget[0] = detectedColour
                     print("First target colour set to:", colourTarget[0])
-                if colourTarget[0] != detectedColour and colourTarget[1] == 0:
+                if colourTarget[0] != detectedColour and colourTarget[1] == -1:
                     colourTarget[1] = detectedColour
                     print("Second target colour set to: ", colourTarget[1])
                     findTarget = False
 
-        if rightSensor > 130 and detectedColour in (colourTarget[0], colourTarget[1]):
-            found = False
-            for key, (low, high) in parkRange.items():
+        if distances[0] > 140 and detectedColour in (colourTarget[0], colourTarget[1]):
+            for indexKey, (low, high) in parkRange.items():
                 if low <= currentPos <= high:
-                    slot = int(key)
-                    if slot not in targetNumbers:
+                    slot = int(indexKey)
+                    if slot not in targetNumbers:            # prevent duplicate slots
                         targetNumbers.append(slot)
-                        print("Found park at: ", targetNumbers)
-                    found = True
+                        targetColours.append(detectedColour)  # store colour
+                        print("Found park at:", targetNumbers, "with colours:", targetColours)
 
-        if len(targetNumbers) >= 1:
-            firstTarget = targetNumbers[0]
-            msg = f"setFirstTarget:{firstTarget}\n"
-            conn.sendall(msg.encode())
-            print("Sent: ", msg)
-
-        if len(targetNumbers) == 2:
-            secondTarget = targetNumbers[1]
-            msg = f"setSecondTarget:{secondTarget}\n"
-            conn.sendall(msg.encode())
-            print("Sent: ", msg)
+        if recievedFistTarget == False:
+            if len(targetNumbers) >= 1:
+                firstTarget = targetNumbers[0]
+                msg = f"setFirstTarget:{firstTarget}\n"
+                conn.sendall(msg.encode())
+                print("Sent: ", msg)
+        if recievedSecondTarget == False:
+            if len(targetNumbers) == 2:
+                secondTarget = targetNumbers[1]
+                msg = f"setSecondTarget:{secondTarget}\n"
+                conn.sendall(msg.encode())
+                print("Sent: ", msg)
 
     if key == ord('q'):
-        try:
-            conn.sendall(b"motorStop:0\n")
-            print("Sent stop command to ESP32")
-        except (ConnectionResetError, BrokenPipeError):
-            print("Failed to send command: ESP32 disconnected")
+        # Quit safely
         streaming = False
-        start = False
-        break
+        time.sleep(0.5)  # let threads exit
 
-cv2.destroyAllWindows()
+        try:
+            if conn:
+                conn.sendall(b"motorStop:0\n")
+                conn.close()
+                print("ESP32 connection closed")
+        except:
+            pass
+
+        try:
+            server_socket.close()
+            print("Server socket closed")
+        except:
+            pass
+
+        if 'cap' in globals() and cap.isOpened():
+            cap.release()
+
+        cv2.destroyAllWindows()
+        print("All resources released, program exited.")
+        break

@@ -15,8 +15,6 @@ const int DIST_FROM_TARGET = 200;    // distance past bay before reversing (mm)
 
 int  parkSpacing   = 150;
 int  dist2start    = 425;
-int  firstTarget   = -1;
-int  secondTarget  = -1;
 
 // ---------- STATE FLAGS ----------
 bool runLoop      = true;

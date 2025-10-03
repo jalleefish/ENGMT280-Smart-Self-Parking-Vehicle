@@ -20,5 +20,5 @@ void loop() {
     updateDist();
     receiveComms();
     runSystemLogic();
-    delay(20);
+    delay(30);
 }

@@ -4,9 +4,9 @@
 #include <Arduino.h>
 
 //Outputs
-extern int firstTarget;
-extern int secondTarget;
+
 
 //Functions
+void straightCorrection();
 void saveDistance();
 void runSystemLogic();     // Run system logic loop

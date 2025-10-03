@@ -10,7 +10,8 @@
 #include <WiFi.h>
 
 WiFiClient client;
-
+int  firstTarget   = -1;
+int  secondTarget  = -1;
 String sender = "";
 
 void setupComms() {
@@ -52,9 +53,13 @@ void receiveComms() {
             
             if (cmd == "setFirstTarget") {
                 firstTarget = value;
+                sender = "recievedFistTarget:0";
+                sendComms();    
                 Serial.println("Found First Target: " + String(firstTarget));
             } else if (cmd == "setSecondTarget") {
                 secondTarget = value;
+                sender = "recievedSecondTarget:0";
+                sendComms();
                 Serial.println("Found Second Target: " + String(secondTarget));
             } else if (cmd == "motorForward") {
                 motorForward();
