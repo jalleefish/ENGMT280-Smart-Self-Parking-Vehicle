@@ -10,13 +10,13 @@ wb_locked = False
 recievedFistTarget = False
 recievedSecondTarget = False
 parkRange = {
-             "1" : (340, 420), 
-             "2" : (460, 540), 
-             "3" : (520, 600), 
-             "4" : (640, 720), 
-             "5" : (760, 840), 
-             "6" : (880, 960), 
-             "7" : (1000, 1080)
+             "1" : (340, 400), 
+             "2" : (460, 520), 
+             "3" : (520, 580), 
+             "4" : (640, 700), 
+             "5" : (760, 820), 
+             "6" : (880, 940), 
+             "7" : (1000, 1060)
              }
 print("Logic Configured")
 
@@ -222,6 +222,9 @@ while streaming:
         bgr = bgr[195:h, 2*w//10:5*w//10]  # crop to central region
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
         
+        colours = [-1, 0, 0, 0, 0]  # reset colours each frame
+        detectedColour = -1         # reset detectedColour each frame
+        
         # Create ranges for each color
         blue = cv2.inRange(hsv, lowerBlue, upperBlue)
         green = cv2.inRange(hsv, lowerGreen, upperGreen)
@@ -308,7 +311,7 @@ while streaming:
     
     # === Stage 3: Start the car
     elif  start and colourScan:       
-        print(currentPos, colours, distances, findTarget, colourScan, colourTarget, detectedColour)
+        # print(currentPos, colours, distances, findTarget, colourScan, colourTarget, detectedColour)
         if distances[0] < 130 and findTarget:
             detectedColour = colours[0]
             if colours != [-1, 0, 0, 0, 0]:

@@ -19,7 +19,7 @@ const int STRAIGHT_ANGLE     = 98;
 const int REVERSE_TARGET_POS = 50;
 const int FORWARD_TARGET_POS = 5;
 const int  parkSpacing   = 120;
-const int  dist2start    = 370;
+const int  dist2start    = 410;
 
 // ---------- STATE FLAGS ----------
 bool runLoop      = true;
@@ -41,7 +41,7 @@ int  targetCount  = 0;
 
 // ---------- HELPER: keep straight ----------
 void straightCorrection() {
-    if (parking) return;
+    if (parking || leavePark) return;
     long dS = distances[2];
 
     if (dS < 0) return;                   // ignore if no side wall
@@ -54,6 +54,25 @@ void straightCorrection() {
     steering(98 + turnAngle);
 }
 
+// void rearStraightCorrection(){
+//     long dR = distances[3];
+//     long dL = distances[4];
+
+//     if(dR<0 || dL<0) return; // ignore if invalid reading
+//         int diff = dR - dL;
+//     if(diff > 5){
+//         turnAngle += 1; // steer toward closer wall
+//     } else if (diff < -5){
+//         turnAngle -= 1; // steer toward closer wall
+//     } else {
+//         turnAngle = 0; // keep straight
+//     }
+//     if (abs(turnAngle) > MAX_ANGLE) {
+//         turnAngle = (turnAngle > 0) ? MAX_ANGLE : -MAX_ANGLE;
+//     }
+//     steering(98 + turnAngle);
+// }
+
 bool carParallel() {
     long dR = distances[3];
     long dL = distances[4];
@@ -62,16 +81,6 @@ bool carParallel() {
     return (abs(diff) < 3); // true if within 5mm
     // return (distances[3] == distances[4]);
 }
-
-// parkRange = {
-//              "1" : (245, 320), 
-//              "2" : (360, 430), 
-//              "3" : (475, 550), 
-//              "4" : (595, 660), 
-//              "5" : (720, 780), 
-//              "6" : (820, 870), 
-//              "7" : (840, 930)
-//              }
 
 // ---------- FIRST PARK ----------
 void firstParkLogic() {
@@ -93,7 +102,7 @@ void firstParkLogic() {
     if (pullingForward && !reversingTurn && !carParallel()) {
         motorReverse();
         steering(REVERSE_ANGLE);
-        delay(11000);
+        delay(10000);
         reversingTurn  = true;
     }
 
@@ -101,6 +110,7 @@ void firstParkLogic() {
     if (pullingForward && reversingTurn && !finalReverse && carParallel()) {
         finalReverse   = true;
         steering(STRAIGHT_ANGLE);
+        // rearStraightCorrection();
     }
 
     if (finalReverse && backAverage < 30) {
@@ -118,6 +128,8 @@ void firstParkLogic() {
 // ---------- MAIN LOOP ----------
 void runSystemLogic() {
     straightCorrection();
+    // if (finalReverse) rearStraightCorrection();
+
     if (firstPark)       
         firstParkLogic();
     // else if (secondPark) 

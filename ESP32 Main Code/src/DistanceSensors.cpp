@@ -33,7 +33,7 @@ void updateDist() {
     distances[1] = readDistance(DistPin2) + 0;
     distances[2] = readDistance(DistPin3) + 20;
     distances[3] = readDistance(DistPin4) + 4;
-    distances[4] = readDistance(DistPin5) + 8;
+    distances[4] = readDistance(DistPin5) + 12;
 
     // Debugging output
     Serial.print("Distances: ");
