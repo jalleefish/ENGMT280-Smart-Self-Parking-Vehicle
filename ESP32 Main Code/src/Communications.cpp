@@ -67,8 +67,8 @@ void receiveComms() {
                 motorReverse();
             } else if (cmd == "motorStop") {
                 motorStop();
-            } else if (cmd == "steering") {
-                steering(value);
+            // } else if (cmd == "steering") {
+            //     steering(value);
             } else {
                 Serial.println("Unknown command: " + cmd);
             }

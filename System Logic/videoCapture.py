@@ -10,13 +10,13 @@ wb_locked = False
 recievedFistTarget = False
 recievedSecondTarget = False
 parkRange = {
-             "1" : (245, 320), 
-             "2" : (360, 430), 
-             "3" : (475, 550), 
-             "4" : (595, 660), 
-             "5" : (720, 780), 
-             "6" : (820, 870), 
-             "7" : (840, 930)
+             "1" : (340, 420), 
+             "2" : (460, 540), 
+             "3" : (520, 600), 
+             "4" : (640, 720), 
+             "5" : (760, 840), 
+             "6" : (880, 960), 
+             "7" : (1000, 1080)
              }
 print("Logic Configured")
 
@@ -39,6 +39,8 @@ colours = [-1, 0, 0, 0, 0]
 targetPos = []
 targetNumbers = []
 targetColours = []
+findPark = False
+detectedColour = -1
 firstTarget = -1
 secondTarget = -1
 bgr: np.ndarray | None = None
@@ -135,12 +137,13 @@ rightSensor = 0
 currentPos = 0
 def printDistances():
     while streaming:
-        print(distances)
+        print("Current Position: ", currentPos)
+        print("Distances: ", distances)
         time.sleep(1)
 
 # ---- ESP32 Camera Communications Setup ----
 # cam_ip = "esp32cam.local"
-cam_ip = "192.168.137.138"
+cam_ip = "192.168.137.90"
 stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
 settings_url = f"http://{cam_ip}/control"
 latest_frame = None
@@ -213,7 +216,7 @@ while streaming:
     if backAverage < frontSensor:
         currentPos = backAverage + 105
     else:
-        currentPos = 1688 - 55 -frontSensor
+        currentPos = 1688 - 55 - frontSensor
     if bgr is not None:
         h, w, _ = bgr.shape
         bgr = bgr[195:h, 2*w//10:5*w//10]  # crop to central region
@@ -294,7 +297,6 @@ while streaming:
             try:
                 if conn:
                     conn.sendall(b"motorForward:0\n")
-                    conn.sendall(b"steering:98")
                     print("Sent initial go command to ESP32")
                 else:
                     print("No ESP32 connection available")
@@ -305,11 +307,11 @@ while streaming:
             break
     
     # === Stage 3: Start the car
-    elif start:       
-        detectedColour = colours[0]
-        # print(currentPos, colours, distances, findTarget, colourScan, colourTarget, detectedColour)
+    elif  start and colourScan:       
+        print(currentPos, colours, distances, findTarget, colourScan, colourTarget, detectedColour)
         if distances[0] < 130 and findTarget:
-            if colours != [-1, 0, 0, 0, 0] and colourScan:
+            detectedColour = colours[0]
+            if colours != [-1, 0, 0, 0, 0]:
                 if colourTarget == [-1, -1]:
                     colourTarget[0] = detectedColour
                     print("First target colour set to:", colourTarget[0])
@@ -317,15 +319,19 @@ while streaming:
                     colourTarget[1] = detectedColour
                     print("Second target colour set to: ", colourTarget[1])
                     findTarget = False
-
-        if distances[0] > 140 and detectedColour in (colourTarget[0], colourTarget[1]):
-            for indexKey, (low, high) in parkRange.items():
-                if low <= currentPos <= high:
-                    slot = int(indexKey)
-                    if slot not in targetNumbers:            # prevent duplicate slots
-                        targetNumbers.append(slot)
-                        targetColours.append(detectedColour)  # store colour
-                        print("Found park at:", targetNumbers, "with colours:", targetColours)
+                    findPark = True
+                    detectedColour = -1
+        
+        if distances[0] > 140 and currentPos > 300 and findPark and len(targetNumbers) < 2:
+            detectedColour = colours[0]
+            if detectedColour in (colourTarget[0], colourTarget[1]):
+                for indexKey, (low, high) in parkRange.items():
+                    if low <= currentPos <= high:
+                        slot = int(indexKey)
+                        if slot not in targetNumbers:            # prevent duplicate slots
+                            targetNumbers.append(slot)
+                            targetColours.append(detectedColour)  # store colour
+                            print("Found park at:", targetNumbers, "with colours:", targetColours)
 
         if recievedFistTarget == False:
             if len(targetNumbers) >= 1:

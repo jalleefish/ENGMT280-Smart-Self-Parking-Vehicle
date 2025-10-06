@@ -10,7 +10,7 @@
 #include "Timer.h"
 
 // ---------- GLOBAL CONSTANTS ----------
-const int MAX_ANGLE        = 25;     // max steering angle (deg)
+const int MAX_ANGLE        = 23;     // max steering angle (deg)
 const int PARK_DIST        = 30;     // stop distance inside bay (mm)
 const int DIST_FROM_TARGET = 50;    // distance past bay before reversing (mm)
 const int REVERSE_ANGLE      = 98 - MAX_ANGLE;
@@ -19,7 +19,7 @@ const int STRAIGHT_ANGLE     = 98;
 const int REVERSE_TARGET_POS = 50;
 const int FORWARD_TARGET_POS = 5;
 const int  parkSpacing   = 120;
-const int  dist2start    = 240;
+const int  dist2start    = 370;
 
 // ---------- STATE FLAGS ----------
 bool runLoop      = true;
@@ -59,7 +59,8 @@ bool carParallel() {
     long dL = distances[4];
     if (dR < 0 || dL < 0) return false; // invalid reading → not parallel
     int diff = dR - dL;
-    return (abs(diff) < 5); // true if within 10mm
+    return (abs(diff) < 3); // true if within 5mm
+    // return (distances[3] == distances[4]);
 }
 
 // parkRange = {
@@ -78,38 +79,28 @@ void firstParkLogic() {
     colourScan = false;
     parking = true;
     int targetPos = dist2start + firstTarget * parkSpacing;
-    int frontSensor = distances[1];
     int backAverage = (distances[3] + distances[4]) / 2;
-    if (backAverage < distances[1]) {
-        carPos = backAverage + 105;
-    } else {
-        carPos = 1688 - 55 - frontSensor;
-    }
-   
+    carPos = backAverage + 105;
+
     // Turn forward for 2s
     if (!pullingForward && (carPos > targetPos)) {
         steering(FORWARD_ANGLE);
-        delay(2500);
+        delay(6500);
         pullingForward = true;
-        return;
     }
 
     // --- 2. switch to forward pull after arc ---
-    if (pullingForward) {
-        reversingTurn  = true;
-        pullingForward = false;
+    if (pullingForward && !reversingTurn && !carParallel()) {
         motorReverse();
         steering(REVERSE_ANGLE);
-        return;
+        delay(11000);
+        reversingTurn  = true;
     }
 
     // --- 3. pull forward then final straight reverse ---
-    if (reversingTurn && carParallel()) {
-        reversingTurn = false;
+    if (pullingForward && reversingTurn && !finalReverse && carParallel()) {
         finalReverse   = true;
-        motorReverse();
         steering(STRAIGHT_ANGLE);
-        return;
     }
 
     if (finalReverse && backAverage < 30) {
@@ -126,15 +117,11 @@ void firstParkLogic() {
 
 // ---------- MAIN LOOP ----------
 void runSystemLogic() {
+    straightCorrection();
     if (firstPark)       
         firstParkLogic();
     // else if (secondPark) 
-    //     secondParkLogic();
-    else                 
-        motorStop();
-    if (!parking){
-        straightCorrection();
-    }
+        // secondParkLogic();
     
     sender = "distances:" + 
              String(distances[0]) + "," +
