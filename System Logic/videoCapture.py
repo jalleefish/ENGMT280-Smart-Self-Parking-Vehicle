@@ -209,6 +209,7 @@ while streaming:
     rightSensor = distances[0]
     frontSensor = distances[1]
     backAverage = (distances[3] + distances[4]) / 2
+    
     if backAverage < frontSensor:
         currentPos = backAverage + 105
     else:
