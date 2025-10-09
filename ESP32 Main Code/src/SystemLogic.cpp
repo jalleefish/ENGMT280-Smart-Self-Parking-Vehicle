@@ -36,6 +36,8 @@ bool finalReverse   = false;
 // ---------- OUTPUTS ----------
 int  motorCmd     = 0;
 int  turnAngle    = 0;
+int backAverage  = 0;
+int frontSensor  = 0;
 int  carPos       = 0;
 int  targetCount  = 0;
 
@@ -54,24 +56,24 @@ void straightCorrection() {
     steering(98 + turnAngle);
 }
 
-// void rearStraightCorrection(){
-//     long dR = distances[3];
-//     long dL = distances[4];
+void rearStraightCorrection(){
+    long dR = distances[3];
+    long dL = distances[4];
 
-//     if(dR<0 || dL<0) return; // ignore if invalid reading
-//         int diff = dR - dL;
-//     if(diff > 5){
-//         turnAngle += 1; // steer toward closer wall
-//     } else if (diff < -5){
-//         turnAngle -= 1; // steer toward closer wall
-//     } else {
-//         turnAngle = 0; // keep straight
-//     }
-//     if (abs(turnAngle) > MAX_ANGLE) {
-//         turnAngle = (turnAngle > 0) ? MAX_ANGLE : -MAX_ANGLE;
-//     }
-//     steering(98 + turnAngle);
-// }
+    if(dR<0 || dL<0) return; // ignore if invalid reading
+        int diff = dR - dL;
+    if(diff > 5){
+        turnAngle += 1; // steer toward closer wall
+    } else if (diff < -5){
+        turnAngle -= 1; // steer toward closer wall
+    } else {
+        turnAngle = 0; // keep straight
+    }
+    if (abs(turnAngle) > MAX_ANGLE) {
+        turnAngle = (turnAngle > 0) ? MAX_ANGLE : -MAX_ANGLE;
+    }
+    steering(98 + turnAngle);
+}
 
 bool carParallel() {
     long dR = distances[3];
@@ -82,14 +84,23 @@ bool carParallel() {
     // return (distances[3] == distances[4]);
 }
 
+void carPosition() {
+    backAverage = (distances[3] + distances[4]) / 2;
+    frontSensor = distances[1];
+
+    if (backAverage < frontSensor) {
+        carPos = backAverage + 105;
+    } else {
+        carPos = 1688 - 60 - frontSensor; // Bigger offsset = closer to end
+    }
+}
+
 // ---------- FIRST PARK ----------
 void firstParkLogic() {
     if (firstTarget == -1) return;
     colourScan = false;
     parking = true;
     int targetPos = dist2start + firstTarget * parkSpacing;
-    int backAverage = (distances[3] + distances[4]) / 2;
-    carPos = backAverage + 105;
 
     // Turn forward for 2s
     if (!pullingForward && (carPos > targetPos)) {
@@ -102,7 +113,65 @@ void firstParkLogic() {
     if (pullingForward && !reversingTurn && !carParallel()) {
         motorReverse();
         steering(REVERSE_ANGLE);
-        delay(10000);
+        delay(14000);
+        reversingTurn  = true;
+    }
+
+    // --- 3. pull forward then final straight reverse ---
+    if (pullingForward && reversingTurn && !finalReverse && carParallel()) {
+        finalReverse   = true;
+        steering(STRAIGHT_ANGLE);
+        // rearStraightCorrection();
+    }
+
+    if (finalReverse && backAverage < 30) {
+        motorStop();
+        reversingTurn  = false;
+        pullingForward = false;
+        finalReverse   = false;
+        reversing     = false;
+        parking       = false;
+        leavePark     = true;
+        firstPark     = false;
+        secondPark    = true;   // move to second stage
+        motorForward();
+    }
+}
+
+void leaveParkLogic() {
+    if (!leavePark) return;
+        motorForward();
+        steering(STRAIGHT_ANGLE);
+        delay(7000);
+        steering(REVERSE_ANGLE);
+        delay(11000);
+        steering(STRAIGHT_ANGLE);
+        motorReverse();
+        steering(FORWARD_ANGLE);
+        delay(7500);
+        motorForward();
+        leavePark = false;
+        colourScan = true;
+}
+
+void secondParkLogic() {
+    if (secondTarget == -1) return;
+    colourScan = false;
+    parking = true;
+    int targetPos = dist2start + secondTarget * parkSpacing;
+
+    // Turn forward for 2s
+    if (!pullingForward && (carPos > targetPos)) {
+        steering(FORWARD_ANGLE);
+        delay(6500);
+        pullingForward = true;
+    }
+
+    // --- 2. switch to forward pull after arc ---
+    if (pullingForward && !reversingTurn && !carParallel()) {
+        motorReverse();
+        steering(REVERSE_ANGLE);
+        delay(14000);
         reversingTurn  = true;
     }
 
@@ -118,22 +187,22 @@ void firstParkLogic() {
         reversing     = false;
         parking       = false;
         leavePark     = true;
-        firstPark     = false;
-        secondPark    = true;   // move to second stage
-        delay(500);
-        motorForward();
+        secondPark    = false;   // move to second stage
     }
 }
 
 // ---------- MAIN LOOP ----------
 void runSystemLogic() {
     straightCorrection();
+    carPosition();
     // if (finalReverse) rearStraightCorrection();
 
     if (firstPark)       
         firstParkLogic();
-    // else if (secondPark) 
-        // secondParkLogic();
+    if (leavePark)     
+        leaveParkLogic();
+    else if (secondPark && !leavePark) 
+        secondParkLogic();
     
     sender = "distances:" + 
              String(distances[0]) + "," +

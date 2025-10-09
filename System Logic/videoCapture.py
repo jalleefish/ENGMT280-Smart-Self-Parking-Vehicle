@@ -10,13 +10,14 @@ wb_locked = False
 recievedFistTarget = False
 recievedSecondTarget = False
 parkRange = {
-             "1" : (340, 400), 
-             "2" : (460, 520), 
-             "3" : (520, 580), 
-             "4" : (640, 700), 
-             "5" : (760, 820), 
-             "6" : (880, 940), 
-             "7" : (1000, 1060)
+             "1" : (350, 390), 
+             "2" : (470, 500), 
+             "3" : (590, 630), 
+             "4" : (700, 730), 
+             "5" : (800, 860), 
+             "6" : (940, 990), 
+             "7" : (1040, 1100),
+             "8" : (1170, 1220)
              }
 print("Logic Configured")
 
@@ -143,7 +144,7 @@ def printDistances():
 
 # ---- ESP32 Camera Communications Setup ----
 # cam_ip = "esp32cam.local"
-cam_ip = "192.168.137.90"
+cam_ip = "192.168.137.218"
 stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
 settings_url = f"http://{cam_ip}/control"
 latest_frame = None
@@ -216,7 +217,7 @@ while streaming:
     if backAverage < frontSensor:
         currentPos = backAverage + 105
     else:
-        currentPos = 1688 - 55 - frontSensor
+        currentPos = 1688 - 80 - frontSensor
     if bgr is not None:
         h, w, _ = bgr.shape
         bgr = bgr[195:h, 2*w//10:5*w//10]  # crop to central region
