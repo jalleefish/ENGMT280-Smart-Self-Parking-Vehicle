@@ -144,7 +144,7 @@ def printDistances():
 
 # ---- ESP32 Camera Communications Setup ----
 # cam_ip = "esp32cam.local"
-cam_ip = "192.168.137.218"
+cam_ip = "192.168.137.110"
 stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
 settings_url = f"http://{cam_ip}/control"
 latest_frame = None
@@ -164,6 +164,7 @@ esp32cam_defaults = {
     # Color / image
     "contrast": 1,        # -2 to 2
     "saturation": 2,      # -2 to 2
+    
     "brightness": 1,      # -2 to 2
     "special_effect": 0,  # 0 = None
     "wb_mode": 0,         # 0 = Auto / default

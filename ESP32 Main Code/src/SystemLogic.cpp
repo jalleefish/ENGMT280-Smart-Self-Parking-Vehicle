@@ -32,6 +32,7 @@ bool colourScan   = true;
 bool reversingTurn  = false;
 bool pullingForward = false;
 bool finalReverse   = false;
+bool complete      = false;
 
 // ---------- OUTPUTS ----------
 int  motorCmd     = 0;
@@ -89,7 +90,7 @@ void carPosition() {
     frontSensor = distances[1];
 
     if (backAverage < frontSensor) {
-        carPos = backAverage + 105;
+        carPos = backAverage + 85; // Bigger offset = closer to end
     } else {
         carPos = 1688 - 60 - frontSensor; // Bigger offsset = closer to end
     }
@@ -113,7 +114,7 @@ void firstParkLogic() {
     if (pullingForward && !reversingTurn && !carParallel()) {
         motorReverse();
         steering(REVERSE_ANGLE);
-        delay(14000);
+        delay(15000);
         reversingTurn  = true;
     }
 
@@ -142,9 +143,9 @@ void leaveParkLogic() {
     if (!leavePark) return;
         motorForward();
         steering(STRAIGHT_ANGLE);
-        delay(7000);
+        delay(7500);
         steering(REVERSE_ANGLE);
-        delay(11000);
+        delay(11500);
         steering(STRAIGHT_ANGLE);
         motorReverse();
         steering(FORWARD_ANGLE);
@@ -186,7 +187,8 @@ void secondParkLogic() {
         motorStop();
         reversing     = false;
         parking       = false;
-        leavePark     = true;
+        leavePark     = false;
+        complete      = true;
         secondPark    = false;   // move to second stage
     }
 }
@@ -203,6 +205,8 @@ void runSystemLogic() {
         leaveParkLogic();
     else if (secondPark && !leavePark) 
         secondParkLogic();
+    if (complete)
+        motorStop();
     
     sender = "distances:" + 
              String(distances[0]) + "," +
