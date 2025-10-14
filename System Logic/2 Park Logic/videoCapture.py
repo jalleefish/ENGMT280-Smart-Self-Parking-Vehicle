@@ -8,7 +8,7 @@ streaming = True
 calibrating = True
 wb_locked = False
 recievedFistTarget = False
-# recievedSecondTarget = False
+recievedSecondTarget = False
 parkRange = {
              "1" : (350, 390), 
              "2" : (470, 500), 
@@ -43,9 +43,37 @@ targetColours = []
 findPark = False
 detectedColour = -1
 firstTarget = -1
-# secondTarget = -1
+secondTarget = -1
 bgr: np.ndarray | None = None
 print("Colours Configured")
+
+# ---- System Timer Setup ----
+class Clock:
+    def __init__(self, interval: float):
+        self.interval: float = interval
+        self.last_time = time.time()
+        self.running = True
+
+    def start(self):
+        self.running = True
+        self.last_time = time.time()
+
+    def stop(self):
+        self.running = False
+
+    def reset(self):
+        self.last_time = time.time()
+
+    def ready(self):
+        if not self.running:
+            return False
+        now = time.time()
+        if now - self.last_time >= self.interval:
+            self.last_time = now
+            return True
+        return False 
+clock = Clock(interval=3)  # take snapshot every 2s
+print("Timer Setup")
 
 # ---- ESP32 Main Board Communications Setup ----
 HOST = "0.0.0.0"
@@ -292,9 +320,9 @@ while streaming:
                 if colourTarget == [-1, -1]:
                     colourTarget[0] = detectedColour
                     print("First target colour set to:", colourTarget[0])
-                # if colourTarget[0] != detectedColour and colourTarget[1] == -1:
-                #     colourTarget[1] = detectedColour
-                #     print("Second target colour set to: ", colourTarget[1])
+                if colourTarget[0] != detectedColour and colourTarget[1] == -1:
+                    colourTarget[1] = detectedColour
+                    print("Second target colour set to: ", colourTarget[1])
                     findTarget = False
                     findPark = True
                     detectedColour = -1
@@ -316,12 +344,12 @@ while streaming:
                 msg = f"setFirstTarget:{firstTarget}\n"
                 conn.sendall(msg.encode())
                 print("Sent: ", msg)
-        # if recievedSecondTarget == False:
-        #     if len(targetNumbers) == 2:
-        #         secondTarget = targetNumbers[1]
-        #         msg = f"setSecondTarget:{secondTarget}\n"
-        #         conn.sendall(msg.encode())
-        #         print("Sent: ", msg)
+        if recievedSecondTarget == False:
+            if len(targetNumbers) == 2:
+                secondTarget = targetNumbers[1]
+                msg = f"setSecondTarget:{secondTarget}\n"
+                conn.sendall(msg.encode())
+                print("Sent: ", msg)
 
     if key == ord('q'):
         # Quit safely

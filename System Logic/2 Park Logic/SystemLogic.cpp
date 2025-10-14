@@ -7,6 +7,7 @@
 #include "ServoMotorControl.h"
 #include "Communications.h"
 #include "SystemLogic.h"
+#include "Timer.h"
 
 // ---------- GLOBAL CONSTANTS ----------
 const int MAX_ANGLE        = 23;     // max steering angle (deg)
@@ -23,7 +24,7 @@ const int  dist2start    = 410;
 // ---------- STATE FLAGS ----------
 bool runLoop      = true;
 bool firstPark    = true;
-// bool secondPark   = false;
+bool secondPark   = false;
 bool reversing    = false;
 bool parking      = false;
 bool leavePark    = false;
@@ -131,66 +132,66 @@ void firstParkLogic() {
         finalReverse   = false;
         reversing     = false;
         parking       = false;
+        leavePark     = true;
         firstPark     = false;
-        complete      = true;
-        // leavePark     = true;
-        // secondPark    = true;   // move to second stage
+        secondPark    = true;   // move to second stage
+        motorForward();
     }
 }
 
-// void leaveParkLogic() {
-//     if (!leavePark) return;
-//         motorForward();
-//         steering(STRAIGHT_ANGLE);
-//         delay(7500);
-//         steering(REVERSE_ANGLE);
-//         delay(11500);
-//         steering(STRAIGHT_ANGLE);
-//         motorReverse();
-//         steering(FORWARD_ANGLE);
-//         delay(7500);
-//         motorForward();
-//         leavePark = false;
-//         colourScan = true;
-// }
+void leaveParkLogic() {
+    if (!leavePark) return;
+        motorForward();
+        steering(STRAIGHT_ANGLE);
+        delay(7500);
+        steering(REVERSE_ANGLE);
+        delay(11500);
+        steering(STRAIGHT_ANGLE);
+        motorReverse();
+        steering(FORWARD_ANGLE);
+        delay(7500);
+        motorForward();
+        leavePark = false;
+        colourScan = true;
+}
 
-// void secondParkLogic() {
-//     if (secondTarget == -1) return;
-//     colourScan = false;
-//     parking = true;
-//     int targetPos = dist2start + secondTarget * parkSpacing;
+void secondParkLogic() {
+    if (secondTarget == -1) return;
+    colourScan = false;
+    parking = true;
+    int targetPos = dist2start + secondTarget * parkSpacing;
 
-//     // Turn forward for 2s
-//     if (!pullingForward && (carPos > targetPos)) {
-//         steering(FORWARD_ANGLE);
-//         delay(6500);
-//         pullingForward = true;
-//     }
+    // Turn forward for 2s
+    if (!pullingForward && (carPos > targetPos)) {
+        steering(FORWARD_ANGLE);
+        delay(6500);
+        pullingForward = true;
+    }
 
-//     // --- 2. switch to forward pull after arc ---
-//     if (pullingForward && !reversingTurn && !carParallel()) {
-//         motorReverse();
-//         steering(REVERSE_ANGLE);
-//         delay(14000);
-//         reversingTurn  = true;
-//     }
+    // --- 2. switch to forward pull after arc ---
+    if (pullingForward && !reversingTurn && !carParallel()) {
+        motorReverse();
+        steering(REVERSE_ANGLE);
+        delay(14000);
+        reversingTurn  = true;
+    }
 
-//     // --- 3. pull forward then final straight reverse ---
-//     if (pullingForward && reversingTurn && !finalReverse && carParallel()) {
-//         finalReverse   = true;
-//         steering(STRAIGHT_ANGLE);
-//         // rearStraightCorrection();
-//     }
+    // --- 3. pull forward then final straight reverse ---
+    if (pullingForward && reversingTurn && !finalReverse && carParallel()) {
+        finalReverse   = true;
+        steering(STRAIGHT_ANGLE);
+        // rearStraightCorrection();
+    }
 
-//     if (finalReverse && backAverage < 30) {
-//         motorStop();
-//         reversing     = false;
-//         parking       = false;
-//         leavePark     = false;
-//         complete      = true;
-//         secondPark    = false;   // move to second stage
-//     }
-// }
+    if (finalReverse && backAverage < 30) {
+        motorStop();
+        reversing     = false;
+        parking       = false;
+        leavePark     = false;
+        complete      = true;
+        secondPark    = false;   // move to second stage
+    }
+}
 
 // ---------- MAIN LOOP ----------
 void runSystemLogic() {
@@ -200,10 +201,10 @@ void runSystemLogic() {
 
     if (firstPark)       
         firstParkLogic();
-    // if (leavePark)     
-    //     leaveParkLogic();
-    // else if (secondPark && !leavePark) 
-    //     secondParkLogic();
+    if (leavePark)     
+        leaveParkLogic();
+    else if (secondPark && !leavePark) 
+        secondParkLogic();
     if (complete)
         motorStop();
     

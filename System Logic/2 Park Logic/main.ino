@@ -7,6 +7,7 @@
 #include "ServoMotorControl.h"
 #include "Communications.h"
 #include "SystemLogic.h"
+#include "Timer.h"
 
 void setup() {
     Serial.begin(115200);
