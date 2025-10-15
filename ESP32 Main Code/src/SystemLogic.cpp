@@ -89,7 +89,7 @@ void carPosition() {
     frontSensor = distances[1];
 
     if (backAverage < frontSensor) {
-        carPos = backAverage + 85; // Bigger offset = closer to end
+        carPos = backAverage + 105; // Bigger offset = closer to end
     } else {
         carPos = 1688 - 60 - frontSensor; // Bigger offsset = closer to end
     }
@@ -113,7 +113,7 @@ void firstParkLogic() {
     if (pullingForward && !reversingTurn && !carParallel()) {
         motorReverse();
         steering(REVERSE_ANGLE);
-        delay(15000);
+        delay(14000);
         reversingTurn  = true;
     }
 

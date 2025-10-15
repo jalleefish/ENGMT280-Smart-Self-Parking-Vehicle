@@ -116,7 +116,7 @@ def printDistances():
 
 # ---- ESP32 Camera Communications Setup ----
 # cam_ip = "esp32cam.local"
-cam_ip = "192.168.137.110"
+cam_ip = "192.168.137.148"
 stream_url = f"http://{cam_ip}:81/stream"  # ESP32-CAM MJPEG stream URL
 settings_url = f"http://{cam_ip}/control"
 latest_frame = None
@@ -301,7 +301,8 @@ while streaming:
         
         if distances[0] > 140 and currentPos > 300 and findPark and len(targetNumbers) < 2:
             detectedColour = colours[0]
-            if detectedColour in (colourTarget[0], colourTarget[1]):
+            print(colourTarget, detectedColour)
+            if detectedColour == colourTarget[0]:
                 for indexKey, (low, high) in parkRange.items():
                     if low <= currentPos <= high:
                         slot = int(indexKey)
